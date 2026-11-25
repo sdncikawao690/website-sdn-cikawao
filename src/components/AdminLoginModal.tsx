@@ -13,6 +13,7 @@ import {
 import { useSchool } from '../context/SchoolContext';
 import {
   FIREBASE_AUTH_PROVIDERS_URL,
+  FIREBASE_AUTH_SETTINGS_URL,
   FIREBASE_AUTH_USERS_URL,
   FirebaseAuthUiError,
 } from '../lib/firebase';
@@ -83,7 +84,12 @@ export function AdminLoginModal({
       onClose();
       onSuccessDashboard();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Login Google dibatalkan atau gagal.');
+      if (err instanceof FirebaseAuthUiError) {
+        setErrorCode(err.code);
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg(err instanceof Error ? err.message : 'Login Google dibatalkan atau gagal.');
+      }
     } finally {
       setBusy(false);
     }
@@ -99,7 +105,7 @@ export function AdminLoginModal({
       >
         <div className="px-6 py-4 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 text-white flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/95 p-1 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl logo-light-badge bg-white/95 p-1 flex items-center justify-center shrink-0">
               <img
                 src={SCHOOL_INFO.logoUrl}
                 alt="Logo SDN Cikawao"
@@ -172,6 +178,37 @@ export function AdminLoginModal({
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <span>{errorMsg}</span>
               </div>
+
+              {errorCode === 'auth/unauthorized-domain' && (
+                <div className="pt-2 border-t border-rose-200/80 text-[11px] text-rose-950 space-y-1.5">
+                  <p className="font-bold">Cara Mengatasi Domain Netlify Belum Diizinkan:</p>
+                  <ol className="list-decimal pl-4 space-y-1">
+                    <li>
+                      Salin domain aktif Anda saat ini:{' '}
+                      <span className="font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-rose-200">
+                        {typeof window !== 'undefined' ? window.location.hostname : '*.netlify.app'}
+                      </span>
+                    </li>
+                    <li>
+                      Buka{' '}
+                      <a
+                        href={FIREBASE_AUTH_SETTINGS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-bold underline inline-flex items-center gap-1 text-sky-700"
+                      >
+                        Firebase Auth Settings — Authorized domains
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </li>
+                    <li>
+                      Pilih tab <strong>Authorized domains</strong> → klik{' '}
+                      <strong>Add domain</strong> → tempel domain Netlify tersebut → klik{' '}
+                      <strong>Add</strong>.
+                    </li>
+                  </ol>
+                </div>
+              )}
 
               {(errorCode === 'auth/operation-not-allowed' ||
                 errorCode === 'auth/invalid-credential' ||

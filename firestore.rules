@@ -213,6 +213,9 @@ service cloud.firestore {
           'evidencePhotoUrl', 'evidenceVideoUrl', 'updatedBy', 'createdAt', 'updatedAt'
         ]) &&
         data.component in [
+          'Kompetensi Kepribadian',
+          'Kompetensi Sosial',
+          'Kompetensi Profesional',
           'Kepribadian & Sosial',
           'Kepemimpinan Pembelajaran',
           'Pengembangan Sekolah',

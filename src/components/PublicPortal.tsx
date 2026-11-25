@@ -123,11 +123,13 @@ function VisiMisiRunningBanner() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 py-2.5">
         <div className="inline-flex items-center gap-2 bg-amber-400 text-slate-950 px-3 py-1 rounded-lg text-xs font-extrabold whitespace-nowrap shrink-0 shadow-sm">
-          <img
-            src={SCHOOL_INFO.logoUrl}
-            alt="Logo SDN Cikawao"
-            className="w-4 h-4 object-contain"
-          />
+          <span className="w-4 h-4 rounded logo-light-badge inline-flex items-center justify-center p-0.5">
+            <img
+              src={SCHOOL_INFO.logoUrl}
+              alt="Logo SDN Cikawao"
+              className="w-full h-full object-contain"
+            />
+          </span>
           <span>VISI MISI</span>
         </div>
 
@@ -284,7 +286,7 @@ export function PublicPortal({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
                 <div className="lg:col-span-7 flex flex-col justify-center">
                   <div className="flex items-center gap-3.5 mb-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white border-2 border-sky-200 p-1.5 shadow-sm shrink-0 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-2xl logo-light-badge bg-white border-2 border-sky-200 p-1.5 shadow-sm shrink-0 flex items-center justify-center">
                       <img
                         src={SCHOOL_INFO.logoUrl}
                         alt="Logo Resmi SDN Cikawao"

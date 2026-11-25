@@ -20,6 +20,7 @@ export const auth = getAuth(app);
 export const FIREBASE_PROJECT_ID = firebaseConfig.projectId;
 export const FIREBASE_AUTH_PROVIDERS_URL = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers`;
 export const FIREBASE_AUTH_USERS_URL = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/users`;
+export const FIREBASE_AUTH_SETTINGS_URL = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/settings`;
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
@@ -148,6 +149,24 @@ function mapAuthError(err: unknown): FirebaseAuthUiError {
         rawCode,
         'Terlalu banyak percobaan login. Tunggu beberapa saat lalu coba kembali.'
       );
+    case 'auth/unauthorized-domain': {
+      const host = typeof window !== 'undefined' ? window.location.hostname : 'domain situs ini';
+      return new FirebaseAuthUiError(
+        rawCode,
+        `Domain "${host}" belum didaftarkan di Authorized Domains Firebase Authentication. Tambahkan domain tersebut di Firebase Console agar Login Google dapat berjalan.`
+      );
+    }
+    case 'auth/popup-blocked':
+      return new FirebaseAuthUiError(
+        rawCode,
+        'Jendela popup Login Google diblokir oleh browser. Izinkan pop-up untuk situs ini lalu coba lagi.'
+      );
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return new FirebaseAuthUiError(
+        rawCode,
+        'Jendela Login Google ditutup sebelum proses masuk selesai.'
+      );
     case 'auth/user-disabled':
       return new FirebaseAuthUiError(
         rawCode,
@@ -162,8 +181,12 @@ function mapAuthError(err: unknown): FirebaseAuthUiError {
 }
 
 export async function signInWithGoogle(): Promise<User> {
-  const result = await signInWithPopup(auth, googleProvider);
-  return result.user;
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result.user;
+  } catch (err) {
+    throw mapAuthError(err);
+  }
 }
 
 export async function signInWithCredentials(

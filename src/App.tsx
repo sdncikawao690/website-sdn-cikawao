@@ -8,6 +8,7 @@ import { Navbar } from './components/Navbar';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { PublicPortal } from './components/PublicPortal';
 import { SchoolProvider, useSchool } from './context/SchoolContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { SCHOOL_INFO, TIM_IT_ACCOUNT, type PublicTabId } from './types/school';
 
 function AppShell() {
@@ -175,9 +176,11 @@ function AppShell() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <SchoolProvider>
-        <AppShell />
-      </SchoolProvider>
+      <ThemeProvider>
+        <SchoolProvider>
+          <AppShell />
+        </SchoolProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

@@ -41,12 +41,27 @@ export type GalleryCategory =
 export type GalleryMediaType = 'foto' | 'video';
 
 export type PkksComponent =
+  | 'Kompetensi Kepribadian'
+  | 'Kompetensi Sosial'
+  | 'Kompetensi Profesional'
   | 'Kepribadian & Sosial'
   | 'Kepemimpinan Pembelajaran'
   | 'Pengembangan Sekolah'
   | 'Manajemen Sumber Daya'
   | 'Kewirausahaan'
   | 'Supervisi Guru & Tendik';
+
+export const PKKS_COMPONENTS: PkksComponent[] = [
+  'Kompetensi Kepribadian',
+  'Kompetensi Sosial',
+  'Kompetensi Profesional',
+  'Kepribadian & Sosial',
+  'Kepemimpinan Pembelajaran',
+  'Pengembangan Sekolah',
+  'Manajemen Sumber Daya',
+  'Kewirausahaan',
+  'Supervisi Guru & Tendik',
+];
 
 export type PkksStatus = 'Terpenuhi' | 'Proses Verifikasi' | 'Perlu Lengkapi';
 

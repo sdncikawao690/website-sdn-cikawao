@@ -3,6 +3,7 @@ import { LogOut } from 'lucide-react';
 import { useSchool } from '../context/SchoolContext';
 import { SCHOOL_INFO, TIM_IT_ACCOUNT } from '../types/school';
 import { Icon3D, type Icon3DName } from './Icon3D';
+import { ThemeModeSwitcher } from './ThemeModeSwitcher';
 import { AnnouncementsTab } from './dashboard/AnnouncementsTab';
 import { JabarBeraksiTab } from './dashboard/JabarBeraksiTab';
 import { NewsGalleryTab } from './dashboard/NewsGalleryTab';
@@ -149,7 +150,7 @@ export function DashboardLayout({
       <aside className="w-full lg:w-[270px] bg-white border-b lg:border-b-0 lg:border-r border-sky-200 shrink-0 flex flex-col">
         <div className="p-4 bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-600 text-white">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-white p-1 shrink-0 shadow-sm flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl logo-light-badge bg-white p-1 shrink-0 shadow-sm flex items-center justify-center">
               <img
                 src={SCHOOL_INFO.logoUrl}
                 alt="Logo SDN Cikawao"
@@ -206,7 +207,8 @@ export function DashboardLayout({
           })}
         </nav>
 
-        <div className="hidden lg:block p-3 border-t border-sky-100">
+        <div className="hidden lg:block p-3 border-t border-sky-100 space-y-2.5">
+          <ThemeModeSwitcher variant="full" />
           <button
             type="button"
             onClick={() => void handleLogout()}

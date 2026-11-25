@@ -1,22 +1,19 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Edit2, ExternalLink, Plus, Trash2, Video, X } from 'lucide-react';
 import { useSchool } from '../../context/SchoolContext';
-import type { PkksComponent, PkksItem, PkksStatus } from '../../types/school';
+import {
+  PKKS_COMPONENTS,
+  type PkksComponent,
+  type PkksItem,
+  type PkksStatus,
+} from '../../types/school';
 import { Icon3D } from '../Icon3D';
 import { MediaPicker } from '../MediaPicker';
 import { SafeImage } from '../SafeImage';
 
-const PKKS_COMPONENTS: PkksComponent[] = [
-  'Kepribadian & Sosial',
-  'Kepemimpinan Pembelajaran',
-  'Pengembangan Sekolah',
-  'Manajemen Sumber Daya',
-  'Kewirausahaan',
-  'Supervisi Guru & Tendik',
-];
-
 export function PkksTab() {
   const { user, pkksItems, savePkks, removePkks } = useSchool();
+  const [componentFilter, setComponentFilter] = useState<'Semua' | PkksComponent>('Semua');
   const [modalOpen, setModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [form, setForm] = useState<Omit<PkksItem, 'createdAt' | 'updatedAt'>>({
@@ -90,6 +87,11 @@ export function PkksTab() {
     }
   };
 
+  const filteredPkks = useMemo(() => {
+    if (componentFilter === 'Semua') return pkksItems;
+    return pkksItems.filter((item) => item.component === componentFilter);
+  }, [pkksItems, componentFilter]);
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -115,6 +117,25 @@ export function PkksTab() {
         </button>
       </div>
 
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border-2 border-amber-200 rounded-2xl p-3">
+        <span className="text-xs font-bold text-slate-700 px-1">
+          Filter Komponen PKKS ({filteredPkks.length} indikator):
+        </span>
+        <select
+          aria-label="Filter komponen PKKS"
+          value={componentFilter}
+          onChange={(e) => setComponentFilter(e.target.value as 'Semua' | PkksComponent)}
+          className="px-3 py-1.5 text-xs sm:text-sm font-semibold border border-amber-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+        >
+          <option value="Semua">Semua Komponen ({pkksItems.length})</option>
+          {PKKS_COMPONENTS.map((comp) => (
+            <option key={comp} value={comp}>
+              {comp}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="bg-white border-2 border-amber-200 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -128,7 +149,15 @@ export function PkksTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-amber-100 text-sm">
-              {pkksItems.map((p) => (
+              {filteredPkks.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 px-5 text-center text-xs text-slate-500">
+                    Belum ada indikator pada komponen &ldquo;{componentFilter}&rdquo;. Klik
+                    &ldquo;Tambah Indikator PKKS&rdquo; untuk menambahkan.
+                  </td>
+                </tr>
+              ) : (
+                filteredPkks.map((p) => (
                 <tr key={p.id} className="hover:bg-amber-50/40">
                   <td className="py-3.5 px-5 align-top whitespace-nowrap">
                     <span className="font-mono text-xs font-bold text-amber-700 block">
@@ -215,7 +244,8 @@ export function PkksTab() {
                     </button>
                   </td>
                 </tr>
-              ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>

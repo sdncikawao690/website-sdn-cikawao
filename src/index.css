@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(html.dark, html.dark *));
+
 @theme {
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
@@ -90,3 +92,377 @@
   }
 }
 
+/* ========================================================================= */
+/* NIGHT / DARK MODE (Automatic 18:00-05:59 or Manual Toggle)                */
+/* ========================================================================= */
+html.dark body {
+  background: linear-gradient(135deg, #070d1a 0%, #0f172a 55%, #12182d 100%);
+  color: #e2e8f0;
+}
+
+html.dark .logo-light-badge {
+  background-color: #ffffff !important;
+}
+
+/* White & Neutral Card Surfaces */
+html.dark .bg-white {
+  background-color: #111b2e;
+}
+html.dark .bg-white\/95 {
+  background-color: rgba(15, 23, 42, 0.94);
+}
+html.dark .bg-white\/90 {
+  background-color: rgba(17, 27, 46, 0.9);
+}
+html.dark .bg-white\/80 {
+  background-color: rgba(17, 27, 46, 0.82);
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/60,
+html.dark .bg-slate-50\/70,
+html.dark .bg-slate-50\/80 {
+  background-color: #162138;
+}
+html.dark .bg-slate-100,
+html.dark .bg-slate-200 {
+  background-color: #1d2a44;
+}
+
+/* Vibrant Pastel Surfaces Adapted for Night Viewing */
+html.dark .bg-sky-50,
+html.dark .bg-sky-50\/40,
+html.dark .bg-sky-50\/70,
+html.dark .bg-sky-50\/80,
+html.dark .bg-sky-100,
+html.dark .bg-sky-100\/80 {
+  background-color: rgba(14, 165, 233, 0.14);
+}
+
+html.dark .bg-teal-50,
+html.dark .bg-cyan-50,
+html.dark .bg-cyan-50\/70,
+html.dark .bg-cyan-50\/80,
+html.dark .bg-cyan-100 {
+  background-color: rgba(6, 182, 212, 0.14);
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-50\/40,
+html.dark .bg-emerald-50\/70,
+html.dark .bg-emerald-50\/80,
+html.dark .bg-emerald-100,
+html.dark .bg-emerald-100\/80,
+html.dark .bg-lime-50 {
+  background-color: rgba(16, 185, 129, 0.14);
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/35,
+html.dark .bg-amber-50\/40,
+html.dark .bg-amber-50\/50,
+html.dark .bg-amber-50\/70,
+html.dark .bg-amber-50\/80,
+html.dark .bg-amber-50\/90,
+html.dark .bg-amber-100,
+html.dark .bg-yellow-50,
+html.dark .bg-orange-50 {
+  background-color: rgba(245, 158, 11, 0.14);
+}
+
+html.dark .bg-amber-400 {
+  background-color: #fbbf24;
+  color: #0f172a;
+}
+
+html.dark .bg-rose-50,
+html.dark .bg-rose-50\/40,
+html.dark .bg-rose-50\/70,
+html.dark .bg-rose-50\/80,
+html.dark .bg-rose-100,
+html.dark .bg-rose-100\/80 {
+  background-color: rgba(244, 63, 94, 0.14);
+}
+
+html.dark .bg-violet-50,
+html.dark .bg-violet-50\/35,
+html.dark .bg-violet-50\/50,
+html.dark .bg-violet-50\/70,
+html.dark .bg-violet-50\/80,
+html.dark .bg-purple-50,
+html.dark .bg-purple-50\/40,
+html.dark .bg-purple-50\/80,
+html.dark .bg-indigo-50,
+html.dark .bg-indigo-100 {
+  background-color: rgba(139, 92, 246, 0.15);
+}
+
+/* Pastel Gradient Section & Card Stops */
+html.dark .from-white,
+html.dark .from-white\/55 {
+  --tw-gradient-from: #0f172a;
+}
+html.dark .via-white {
+  --tw-gradient-via: #0f172a;
+}
+html.dark .from-sky-50,
+html.dark .from-sky-50\/70,
+html.dark .from-sky-50\/80,
+html.dark .from-sky-100,
+html.dark .from-sky-100\/80 {
+  --tw-gradient-from: #0c1d38;
+}
+html.dark .from-cyan-50,
+html.dark .from-cyan-50\/70 {
+  --tw-gradient-from: #0a202e;
+}
+html.dark .from-emerald-50,
+html.dark .from-emerald-50\/60,
+html.dark .from-emerald-50\/70,
+html.dark .from-lime-50 {
+  --tw-gradient-from: #09221d;
+}
+html.dark .from-amber-50,
+html.dark .from-amber-50\/60,
+html.dark .from-amber-100 {
+  --tw-gradient-from: #23190b;
+}
+html.dark .from-rose-50,
+html.dark .from-pink-50 {
+  --tw-gradient-from: #27101b;
+}
+html.dark .from-violet-50,
+html.dark .from-violet-50\/80,
+html.dark .from-purple-50,
+html.dark .from-indigo-50 {
+  --tw-gradient-from: #1b1331;
+}
+
+html.dark .via-sky-50\/40 {
+  --tw-gradient-via: #0c1b31;
+}
+html.dark .via-emerald-50 {
+  --tw-gradient-via: #0b201c;
+}
+html.dark .via-amber-50\/35,
+html.dark .via-amber-50\/40,
+html.dark .via-orange-50 {
+  --tw-gradient-via: #1c160b;
+}
+html.dark .via-slate-100 {
+  --tw-gradient-via: #162138;
+}
+
+html.dark .to-sky-50\/60,
+html.dark .to-blue-50,
+html.dark .to-indigo-50,
+html.dark .to-indigo-50\/70 {
+  --tw-gradient-to: #101d37;
+}
+html.dark .to-emerald-50,
+html.dark .to-emerald-100,
+html.dark .to-teal-50 {
+  --tw-gradient-to: #0b231e;
+}
+html.dark .to-amber-50,
+html.dark .to-amber-50\/40,
+html.dark .to-amber-50\/50,
+html.dark .to-amber-100\/70,
+html.dark .to-yellow-50,
+html.dark .to-orange-50,
+html.dark .to-orange-50\/80 {
+  --tw-gradient-to: #22190c;
+}
+html.dark .to-rose-50,
+html.dark .to-rose-50\/40,
+html.dark .to-rose-50\/50,
+html.dark .to-rose-50\/70,
+html.dark .to-pink-50,
+html.dark .to-pink-50\/50,
+html.dark .to-fuchsia-50,
+html.dark .to-purple-50 {
+  --tw-gradient-to: #231120;
+}
+html.dark .to-slate-200 {
+  --tw-gradient-to: #1b2842;
+}
+
+/* Navbar Brand Gradient Wordmark in Dark Mode */
+html.dark header .bg-clip-text.from-sky-600 {
+  --tw-gradient-from: #38bdf8;
+  --tw-gradient-via: #34d399;
+  --tw-gradient-to: #fbbf24;
+}
+
+/* Text Contrast */
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f1f5f9;
+}
+html.dark .text-slate-700 {
+  color: #cbd5e1;
+}
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #94a3b8;
+}
+
+html.dark .text-sky-700,
+html.dark .text-sky-800,
+html.dark .text-sky-900,
+html.dark .text-sky-950 {
+  color: #7dd3fc;
+}
+html.dark .text-teal-600,
+html.dark .text-teal-700,
+html.dark .text-teal-900 {
+  color: #5eead4;
+}
+html.dark .text-cyan-600,
+html.dark .text-cyan-700,
+html.dark .text-cyan-800,
+html.dark .text-cyan-900 {
+  color: #67e8f9;
+}
+html.dark .text-emerald-600,
+html.dark .text-emerald-700,
+html.dark .text-emerald-800,
+html.dark .text-emerald-900,
+html.dark .text-emerald-950 {
+  color: #6ee7b7;
+}
+html.dark .text-amber-600,
+html.dark .text-amber-700,
+html.dark .text-amber-800,
+html.dark .text-amber-900,
+html.dark .text-amber-950,
+html.dark .text-yellow-950 {
+  color: #fcd34d;
+}
+html.dark .text-orange-600,
+html.dark .text-orange-700,
+html.dark .text-orange-800,
+html.dark .text-orange-950 {
+  color: #fdba74;
+}
+html.dark .text-rose-600,
+html.dark .text-rose-700,
+html.dark .text-rose-800,
+html.dark .text-rose-900,
+html.dark .text-rose-950,
+html.dark .text-red-700 {
+  color: #fda4af;
+}
+html.dark .text-violet-600,
+html.dark .text-violet-700,
+html.dark .text-violet-800,
+html.dark .text-violet-900,
+html.dark .text-violet-950 {
+  color: #c4b5fd;
+}
+html.dark .text-purple-700,
+html.dark .text-purple-800,
+html.dark .text-purple-950 {
+  color: #d8b4fe;
+}
+html.dark .text-indigo-700,
+html.dark .text-indigo-800,
+html.dark .text-indigo-900 {
+  color: #a5b4fc;
+}
+
+/* Keep dark text legible inside solid bright amber pill/buttons */
+html.dark .bg-amber-400 .text-slate-950,
+html.dark .bg-amber-400.text-slate-950 {
+  color: #0f172a;
+}
+
+/* Borders & Dividers */
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/70,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-300 {
+  border-color: rgba(148, 163, 184, 0.24);
+}
+html.dark .border-sky-50,
+html.dark .border-sky-100,
+html.dark .border-sky-200,
+html.dark .border-sky-300 {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+html.dark .border-teal-200,
+html.dark .border-teal-300,
+html.dark .border-cyan-50,
+html.dark .border-cyan-200,
+html.dark .border-cyan-300 {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+html.dark .border-emerald-100,
+html.dark .border-emerald-200,
+html.dark .border-emerald-300 {
+  border-color: rgba(52, 211, 153, 0.3);
+}
+html.dark .border-amber-100,
+html.dark .border-amber-200,
+html.dark .border-amber-300,
+html.dark .border-yellow-300,
+html.dark .border-orange-200,
+html.dark .border-orange-300 {
+  border-color: rgba(251, 191, 36, 0.32);
+}
+html.dark .border-rose-50,
+html.dark .border-rose-100,
+html.dark .border-rose-200,
+html.dark .border-rose-200\/80,
+html.dark .border-rose-300 {
+  border-color: rgba(251, 113, 133, 0.3);
+}
+html.dark .border-violet-50,
+html.dark .border-violet-100,
+html.dark .border-violet-200,
+html.dark .border-violet-300,
+html.dark .border-purple-50,
+html.dark .border-purple-200,
+html.dark .border-purple-300,
+html.dark .border-indigo-200 {
+  border-color: rgba(167, 139, 250, 0.32);
+}
+
+html.dark .divide-slate-100 > :not(:last-child),
+html.dark .divide-amber-100 > :not(:last-child),
+html.dark .divide-emerald-100 > :not(:last-child),
+html.dark .divide-orange-100 > :not(:last-child),
+html.dark .divide-sky-100 > :not(:last-child),
+html.dark .divide-violet-100 > :not(:last-child) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+/* Form Controls & Hover Surfaces */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark select,
+html.dark textarea {
+  background-color: #0b1324;
+  color: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b;
+}
+
+html.dark .hover\:bg-white:hover,
+html.dark .hover\:bg-white\/80:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-sky-50:hover,
+html.dark .hover\:bg-amber-50\/40:hover,
+html.dark .hover\:bg-amber-100:hover,
+html.dark .hover\:bg-emerald-50\/40:hover,
+html.dark .hover\:bg-emerald-100:hover,
+html.dark .hover\:bg-purple-50\/40:hover,
+html.dark .hover\:bg-cyan-100:hover,
+html.dark .hover\:bg-rose-50:hover,
+html.dark .hover\:bg-rose-100:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}

@@ -409,6 +409,9 @@
         "component": {
           "type": "string",
           "enum": [
+            "Kompetensi Kepribadian",
+            "Kompetensi Sosial",
+            "Kompetensi Profesional",
             "Kepribadian & Sosial",
             "Kepemimpinan Pembelajaran",
             "Pengembangan Sekolah",
