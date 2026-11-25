@@ -95,7 +95,7 @@ const PORTAL_SHORTCUTS: Array<{
   {
     tab: 'peserta-didik',
     title: 'Peserta Didik (Cek NISN)',
-    desc: 'Cari nomor NISN peserta didik secara aman menggunakan Nama Lengkap dan NIK.',
+    desc: 'Cari nomor NISN peserta didik menggunakan Nama Lengkap saja atau NIK saja.',
     icon: 'students',
     cardClass: 'bg-cyan-50/70 border-cyan-200 hover:border-cyan-400',
   },
@@ -184,8 +184,8 @@ export function PublicPortal({
     title: string;
   } | null>(null);
 
-  const [pdName, setPdName] = useState('');
-  const [pdNik, setPdNik] = useState('');
+  const [pdSearchMode, setPdSearchMode] = useState<'nama' | 'nik'>('nama');
+  const [pdQuery, setPdQuery] = useState('');
   const [pdLookupBusy, setPdLookupBusy] = useState(false);
   const [pdLookupError, setPdLookupError] = useState<string | null>(null);
   const [pdLookupResult, setPdLookupResult] = useState<{
@@ -227,6 +227,15 @@ export function PublicPortal({
     [pkksItems]
   );
 
+  const handleSwitchPdMode = (mode: 'nama' | 'nik') => {
+    if (mode === pdSearchMode) return;
+    setPdSearchMode(mode);
+    setPdQuery('');
+    setPdLookupError(null);
+    setPdLookupResult(null);
+    setPdCopied(false);
+  };
+
   const handlePdLookupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPdLookupError(null);
@@ -234,7 +243,7 @@ export function PublicPortal({
     setPdCopied(false);
     setPdLookupBusy(true);
     try {
-      const nisn = await lookupStudentNisn(pdName, pdNik);
+      const nisn = await lookupStudentNisn(pdSearchMode, pdQuery);
       if (nisn) {
         setPdLookupResult({ found: true, nisn });
       } else {
@@ -1269,7 +1278,7 @@ export function PublicPortal({
       )}
 
       {/* ===================================================================== */}
-      {/* TAB: PESERTA DIDIK — PENCARIAN NISN SAJA (NAMA & NIK)                 */}
+      {/* TAB: PESERTA DIDIK — PENCARIAN NISN SAJA (NAMA SAJA ATAU NIK SAJA)    */}
       {/* ===================================================================== */}
       {activeTab === 'peserta-didik' && (
         <section className="flex-1 py-12 bg-gradient-to-b from-cyan-50/70 via-white to-sky-50/60">
@@ -1284,15 +1293,49 @@ export function PublicPortal({
                   Pencarian NISN Peserta Didik
                 </h2>
                 <p className="text-sm text-slate-600 mt-1.5 leading-relaxed">
-                  Masukkan <strong>Nama Lengkap</strong> dan <strong>NIK</strong> peserta didik
-                  sesuai data sekolah untuk menampilkan nomor <strong>NISN</strong>.
+                  Pilih pencarian berdasarkan <strong>Nama Lengkap saja</strong> atau{' '}
+                  <strong>NIK saja</strong> untuk menampilkan nomor <strong>NISN</strong> peserta
+                  didik.
                 </p>
               </div>
             </div>
 
             <div className="bg-white border-2 border-cyan-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+              <div
+                role="tablist"
+                aria-label="Metode pencarian NISN"
+                className="grid grid-cols-2 gap-2 p-1.5 bg-cyan-50/80 border-2 border-cyan-200 rounded-xl"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={pdSearchMode === 'nama'}
+                  onClick={() => handleSwitchPdMode('nama')}
+                  className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer ${
+                    pdSearchMode === 'nama'
+                      ? 'bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm'
+                      : 'text-cyan-900 hover:bg-white/80'
+                  }`}
+                >
+                  Cari dengan Nama
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={pdSearchMode === 'nik'}
+                  onClick={() => handleSwitchPdMode('nik')}
+                  className={`px-4 py-2.5 text-xs sm:text-sm font-bold rounded-lg transition-colors cursor-pointer ${
+                    pdSearchMode === 'nik'
+                      ? 'bg-gradient-to-r from-cyan-600 to-sky-600 text-white shadow-sm'
+                      : 'text-cyan-900 hover:bg-white/80'
+                  }`}
+                >
+                  Cari dengan NIK
+                </button>
+              </div>
+
               <form onSubmit={(e) => void handlePdLookupSubmit(e)} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {pdSearchMode === 'nama' ? (
                   <div>
                     <label
                       htmlFor="pd-search-name"
@@ -1306,12 +1349,13 @@ export function PublicPortal({
                       required
                       minLength={2}
                       maxLength={100}
-                      value={pdName}
-                      onChange={(e) => setPdName(e.target.value)}
+                      value={pdQuery}
+                      onChange={(e) => setPdQuery(e.target.value)}
                       placeholder="Contoh: Alifah Zahra Putri"
                       className="w-full px-3.5 py-2.5 text-sm border-2 border-slate-200 rounded-xl focus:outline-none focus:border-cyan-500"
                     />
                   </div>
+                ) : (
                   <div>
                     <label
                       htmlFor="pd-search-nik"
@@ -1326,13 +1370,13 @@ export function PublicPortal({
                       required
                       minLength={6}
                       maxLength={20}
-                      value={pdNik}
-                      onChange={(e) => setPdNik(normalizeNik(e.target.value))}
+                      value={pdQuery}
+                      onChange={(e) => setPdQuery(normalizeNik(e.target.value))}
                       placeholder="16 digit angka NIK"
                       className="w-full px-3.5 py-2.5 text-sm border-2 border-slate-200 rounded-xl font-mono focus:outline-none focus:border-cyan-500"
                     />
                   </div>
-                </div>
+                )}
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                   <p className="text-xs text-slate-500 inline-flex items-center gap-1.5">
@@ -1391,10 +1435,11 @@ export function PublicPortal({
                 <div className="p-4 bg-amber-50 border border-amber-200 text-amber-950 text-xs leading-relaxed rounded-xl flex items-start gap-2.5">
                   <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                   <span>
-                    NISN belum ditemukan untuk kombinasi Nama Lengkap dan NIK tersebut. Pastikan
-                    penulisan nama dan angka NIK sesuai dengan kartu keluarga/Dapodik sekolah, atau
-                    hubungi pihak sekolah melalui email{' '}
-                    <span className="font-mono font-bold">{SCHOOL_INFO.email}</span>.
+                    NISN belum ditemukan untuk{' '}
+                    {pdSearchMode === 'nama' ? 'Nama Lengkap' : 'NIK'} tersebut. Pastikan penulisan{' '}
+                    {pdSearchMode === 'nama' ? 'nama lengkap' : 'angka NIK'} sesuai dengan data
+                    Dapodik sekolah, coba metode pencarian lainnya, atau hubungi pihak sekolah
+                    melalui email <span className="font-mono font-bold">{SCHOOL_INFO.email}</span>.
                   </span>
                 </div>
               )}

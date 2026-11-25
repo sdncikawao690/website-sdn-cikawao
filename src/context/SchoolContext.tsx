@@ -33,10 +33,12 @@ import {
 } from '../data/seedData';
 import {
   auth,
+  createOrLinkTimItAuthAccount,
   db,
   handleFirestoreError,
   logoutUser,
   OperationType,
+  signInWithCredentials,
   signInWithGoogle,
 } from '../lib/firebase';
 import {
@@ -51,13 +53,16 @@ import {
   clampMediaUrl,
   clampNumber,
   clampString,
-  computeNisnLookupHash,
+  computeNisnNameHash,
+  computeNisnNikHash,
   generateSafeId,
   normalizeNik,
 } from '../lib/validation';
 import {
   GENERATED_IMAGES,
   SCHOOL_INFO,
+  TIM_IT_ACCOUNT,
+  type AdminMarker,
   type Announcement,
   type EkskulReport,
   type GalleryItem,
@@ -86,7 +91,9 @@ interface SchoolContextValue {
   user: User | null;
   authReady: boolean;
   userRole: UserRole | null;
+  isPrimaryAdmin: boolean;
   isAuthorizedAdmin: boolean;
+  adminMarkers: AdminMarker[];
   loadingData: boolean;
   isFirestoreSeeded: boolean;
   siteMedia: SiteMediaConfig;
@@ -107,6 +114,12 @@ interface SchoolContextValue {
   markAnnouncementRead: (id: string) => void;
   markAllAnnouncementsRead: () => void;
   loginWithGoogle: () => Promise<void>;
+  loginWithCredentials: (
+    usernameOrEmail: string,
+    password: string
+  ) => Promise<{ authorized: boolean; uid: string }>;
+  activateTimItAdmin: (password: string) => Promise<void>;
+  revokeTimItAdmin: (uid: string) => Promise<void>;
   logout: () => Promise<void>;
   runInitialSeed: () => Promise<void>;
   // CRUD operations
@@ -190,7 +203,7 @@ interface SchoolContextValue {
     isEdit: boolean
   ) => Promise<void>;
   removeSilokaDocument: (id: string) => Promise<void>;
-  lookupStudentNisn: (fullName: string, nik: string) => Promise<string | null>;
+  lookupStudentNisn: (mode: 'nama' | 'nik', queryValue: string) => Promise<string | null>;
   syncNisnLookupIndex: () => Promise<number>;
 }
 
@@ -202,6 +215,8 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [hasAdminMarker, setHasAdminMarker] = useState(false);
+  const [adminMarkers, setAdminMarkers] = useState<AdminMarker[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isFirestoreSeeded, setIsFirestoreSeeded] = useState(false);
 
@@ -231,74 +246,99 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
   const initialAnnouncementSyncDone = useRef(false);
   const autoSeedAttemptedRef = useRef(false);
 
-  const isAuthorizedAdmin = Boolean(
+  const isPrimaryAdmin = Boolean(
     user &&
       user.email?.toLowerCase() === SCHOOL_INFO.email.toLowerCase() &&
       user.emailVerified
   );
 
+  const isAuthorizedAdmin = Boolean(
+    isPrimaryAdmin || (user && hasAdminMarker && userRole === 'admin')
+  );
+
   const assertAuthorizedAdmin = useCallback(() => {
-    if (
-      !user ||
-      user.email?.toLowerCase() !== SCHOOL_INFO.email.toLowerCase() ||
-      !user.emailVerified
-    ) {
+    if (!isAuthorizedAdmin) {
       throw new Error(
-        `Akses ditolak. Hanya email admin resmi ${SCHOOL_INFO.email} yang dapat menambah atau mengubah data.`
+        `Akses ditolak. Masuk sebagai ${SCHOOL_INFO.email} atau akun Tim IT aktif untuk menambah atau mengubah data.`
       );
     }
-  }, [user]);
+  }, [isAuthorizedAdmin]);
 
-  const resolveUserRole = useCallback(async (firebaseUser: User): Promise<UserRole | null> => {
-    if (
-      firebaseUser.email?.toLowerCase() === SCHOOL_INFO.email.toLowerCase() &&
-      firebaseUser.emailVerified
-    ) {
-      const userRef = doc(db, 'users', firebaseUser.uid);
+  const assertPrimaryAdmin = useCallback(() => {
+    if (!isPrimaryAdmin) {
+      throw new Error(
+        `Operasi ini khusus untuk email admin utama ${SCHOOL_INFO.email}.`
+      );
+    }
+  }, [isPrimaryAdmin]);
+
+  const resolveUserRole = useCallback(
+    async (firebaseUser: User): Promise<{ role: UserRole | null; isMarkerAdmin: boolean }> => {
+      if (
+        firebaseUser.email?.toLowerCase() === SCHOOL_INFO.email.toLowerCase() &&
+        firebaseUser.emailVerified
+      ) {
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        try {
+          const snap = await getDoc(userRef);
+          if (!snap.exists()) {
+            await setDoc(userRef, {
+              uid: firebaseUser.uid,
+              displayName: clampString(
+                firebaseUser.displayName || SCHOOL_INFO.principalName,
+                100
+              ),
+              email: firebaseUser.email,
+              role: 'admin',
+              nipOrNik: SCHOOL_INFO.principalNip,
+              rombel: 'Manajerial Sekolah',
+              status: 'aktif',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            });
+          }
+        } catch (err) {
+          console.warn('Sinkronisasi profil admin:', err);
+        }
+        return { role: 'admin', isMarkerAdmin: true };
+      }
+
       try {
-        const snap = await getDoc(userRef);
-        if (!snap.exists()) {
-          await setDoc(userRef, {
-            uid: firebaseUser.uid,
-            displayName: clampString(
-              firebaseUser.displayName || SCHOOL_INFO.principalName,
-              100
-            ),
-            email: firebaseUser.email,
-            role: 'admin',
-            nipOrNik: SCHOOL_INFO.principalNip,
-            rombel: 'Manajerial Sekolah',
-            status: 'aktif',
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-          });
+        const markerSnap = await getDoc(doc(db, 'admins', firebaseUser.uid));
+        if (markerSnap.exists()) {
+          return { role: 'admin', isMarkerAdmin: true };
         }
       } catch (err) {
-        console.warn('Sinkronisasi profil admin:', err);
+        console.warn('Pemeriksaan marker admin:', err);
       }
-      return 'admin';
-    }
 
-    // Semua email lain hanya berstatus pengunjung read-only
-    return null;
-  }, []);
+      // Semua akun lain hanya berstatus pengunjung read-only
+      return { role: null, isMarkerAdmin: false };
+    },
+    []
+  );
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
       if (firebaseUser) {
-        const role = await resolveUserRole(firebaseUser);
+        const { role, isMarkerAdmin } = await resolveUserRole(firebaseUser);
         setUserRole(role);
+        setHasAdminMarker(isMarkerAdmin);
+        setUser(firebaseUser);
         if (role !== 'admin') {
           setStudents([]);
           setUsers([]);
           setSilokaTickets([]);
+          setAdminMarkers([]);
         }
       } else {
+        setUser(null);
         setUserRole(null);
+        setHasAdminMarker(false);
         setStudents([]);
         setUsers([]);
         setSilokaTickets([]);
+        setAdminMarkers([]);
       }
       setAuthReady(true);
     });
@@ -557,7 +597,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
       )
     );
 
-    // Admin-only PII & management listeners (strictly sdncikawao690@gmail.com)
+    // Admin-only PII & management listeners
     if (isAuthorizedAdmin && userRole === 'admin') {
       unsubs.push(
         onSnapshot(
@@ -598,6 +638,19 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
       );
     }
 
+    if (isPrimaryAdmin) {
+      unsubs.push(
+        onSnapshot(
+          collection(db, 'admins'),
+          (snap) => {
+            const list = snap.docs.map((d) => d.data() as AdminMarker);
+            setAdminMarkers(list);
+          },
+          (error) => handleFirestoreError(error, OperationType.LIST, 'admins')
+        )
+      );
+    }
+
     if (isAuthorizedAdmin && !autoSeedAttemptedRef.current) {
       autoSeedAttemptedRef.current = true;
       void (async () => {
@@ -623,7 +676,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     return () => {
       for (const u of unsubs) u();
     };
-  }, [authReady, user, userRole, isAuthorizedAdmin]);
+  }, [authReady, user, userRole, isAuthorizedAdmin, isPrimaryAdmin]);
 
   const markAnnouncementRead = useCallback((id: string) => {
     setReadAnnouncementIds((prev) => {
@@ -657,6 +710,81 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = useCallback(async () => {
     await signInWithGoogle();
   }, []);
+
+  const loginWithCredentials = useCallback(
+    async (
+      usernameOrEmail: string,
+      password: string
+    ): Promise<{ authorized: boolean; uid: string }> => {
+      const signedUser = await signInWithCredentials(usernameOrEmail, password);
+      const { role, isMarkerAdmin } = await resolveUserRole(signedUser);
+      setUserRole(role);
+      setHasAdminMarker(isMarkerAdmin);
+      setUser(signedUser);
+      return {
+        authorized: role === 'admin' && isMarkerAdmin,
+        uid: signedUser.uid,
+      };
+    },
+    [resolveUserRole]
+  );
+
+  const activateTimItAdmin = useCallback(
+    async (password: string) => {
+      assertPrimaryAdmin();
+      if (!user) throw new Error('Autentikasi diperlukan.');
+      const targetUid = assertValidId(await createOrLinkTimItAuthAccount(password));
+
+      try {
+        await setDoc(doc(db, 'admins', targetUid), {
+          uid: targetUid,
+          email: TIM_IT_ACCOUNT.internalEmail,
+          assignedBy: assertValidId(user.uid),
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.CREATE, `admins/${targetUid}`);
+      }
+
+      const userRef = doc(db, 'users', targetUid);
+      try {
+        const existingUser = await getDoc(userRef);
+        const userPayload = {
+          uid: targetUid,
+          displayName: TIM_IT_ACCOUNT.displayName,
+          email: TIM_IT_ACCOUNT.internalEmail,
+          role: 'admin' as UserRole,
+          rombel: 'Tim IT Sekolah',
+          status: 'aktif' as const,
+          updatedAt: serverTimestamp(),
+        };
+        if (existingUser.exists()) {
+          await updateDoc(userRef, userPayload);
+        } else {
+          await setDoc(userRef, {
+            ...userPayload,
+            createdAt: serverTimestamp(),
+          });
+        }
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `users/${targetUid}`);
+      }
+    },
+    [user, assertPrimaryAdmin]
+  );
+
+  const revokeTimItAdmin = useCallback(
+    async (uid: string) => {
+      assertPrimaryAdmin();
+      const targetUid = assertValidId(uid);
+      try {
+        await deleteDoc(doc(db, 'admins', targetUid));
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, `admins/${targetUid}`);
+      }
+    },
+    [assertPrimaryAdmin]
+  );
 
   const logout = useCallback(async () => {
     await logoutUser();
@@ -873,20 +1001,38 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
           await setDoc(ref, { ...payload, createdAt: serverTimestamp() });
         }
 
-        const newHash =
-          cleanNik.length >= 6 ? await computeNisnLookupHash(cleanFullName, cleanNik) : '';
-        if (oldData?.fullName && oldData?.nik && normalizeNik(oldData.nik).length >= 6) {
-          const oldHash = await computeNisnLookupHash(oldData.fullName, oldData.nik);
-          if (oldHash && oldHash !== newHash) {
+        const newNameHash = await computeNisnNameHash(cleanFullName);
+        const newNikHash =
+          cleanNik.length >= 6 ? await computeNisnNikHash(cleanNik) : '';
+
+        if (oldData?.fullName) {
+          const oldNameHash = await computeNisnNameHash(oldData.fullName);
+          if (oldNameHash && oldNameHash !== newNameHash) {
             try {
-              await deleteDoc(doc(db, 'nisn_lookup', oldHash));
+              await deleteDoc(doc(db, 'nisn_lookup', oldNameHash));
             } catch {
               // Ignore cleanup miss
             }
           }
         }
-        if (newHash) {
-          await setDoc(doc(db, 'nisn_lookup', newHash), {
+        if (oldData?.nik && normalizeNik(oldData.nik).length >= 6) {
+          const oldNikHash = await computeNisnNikHash(oldData.nik);
+          if (oldNikHash && oldNikHash !== newNikHash) {
+            try {
+              await deleteDoc(doc(db, 'nisn_lookup', oldNikHash));
+            } catch {
+              // Ignore cleanup miss
+            }
+          }
+        }
+        if (newNameHash) {
+          await setDoc(doc(db, 'nisn_lookup', newNameHash), {
+            nisn: cleanNisn,
+            updatedAt: serverTimestamp(),
+          });
+        }
+        if (newNikHash) {
+          await setDoc(doc(db, 'nisn_lookup', newNikHash), {
             nisn: cleanNisn,
             updatedAt: serverTimestamp(),
           });
@@ -917,7 +1063,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
 
       let createdCount = 0;
       let updatedCount = 0;
-      const chunkSize = 200;
+      const chunkSize = 150;
 
       for (let i = 0; i < rows.length; i += chunkSize) {
         const chunk = rows.slice(i, i + chunkSize);
@@ -972,10 +1118,18 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
             createdCount += 1;
           }
 
+          const nameHash = await computeNisnNameHash(cleanFullName);
+          if (nameHash) {
+            batch.set(doc(db, 'nisn_lookup', nameHash), {
+              nisn: cleanNisn,
+              updatedAt: serverTimestamp(),
+            });
+          }
+
           if (cleanNik.length >= 6) {
-            const lookupHash = await computeNisnLookupHash(cleanFullName, cleanNik);
-            if (lookupHash) {
-              batch.set(doc(db, 'nisn_lookup', lookupHash), {
+            const nikHash = await computeNisnNikHash(cleanNik);
+            if (nikHash) {
+              batch.set(doc(db, 'nisn_lookup', nikHash), {
                 nisn: cleanNisn,
                 updatedAt: serverTimestamp(),
               });
@@ -1003,10 +1157,24 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
         const snap = await getDoc(doc(db, 'students', docId));
         if (snap.exists()) {
           const data = snap.data() as Partial<StudentRecord>;
-          if (data.fullName && data.nik && normalizeNik(data.nik).length >= 6) {
-            const oldHash = await computeNisnLookupHash(data.fullName, data.nik);
-            if (oldHash) {
-              await deleteDoc(doc(db, 'nisn_lookup', oldHash));
+          if (data.fullName) {
+            const oldNameHash = await computeNisnNameHash(data.fullName);
+            if (oldNameHash) {
+              try {
+                await deleteDoc(doc(db, 'nisn_lookup', oldNameHash));
+              } catch {
+                // Ignore cleanup miss
+              }
+            }
+          }
+          if (data.nik && normalizeNik(data.nik).length >= 6) {
+            const oldNikHash = await computeNisnNikHash(data.nik);
+            if (oldNikHash) {
+              try {
+                await deleteDoc(doc(db, 'nisn_lookup', oldNikHash));
+              } catch {
+                // Ignore cleanup miss
+              }
             }
           }
         }
@@ -1503,19 +1671,26 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
   );
 
   const lookupStudentNisn = useCallback(
-    async (fullName: string, nik: string): Promise<string | null> => {
-      const cleanName = fullName.trim();
-      const cleanNik = normalizeNik(nik);
-      if (cleanName.length < 2) {
-        throw new Error('Masukkan nama lengkap peserta didik minimal 2 karakter.');
+    async (mode: 'nama' | 'nik', queryValue: string): Promise<string | null> => {
+      let hash = '';
+      if (mode === 'nama') {
+        const cleanName = queryValue.trim();
+        if (cleanName.length < 2) {
+          throw new Error('Masukkan nama lengkap peserta didik minimal 2 karakter.');
+        }
+        hash = await computeNisnNameHash(cleanName);
+      } else {
+        const cleanNik = normalizeNik(queryValue);
+        if (cleanNik.length < 6) {
+          throw new Error('Masukkan NIK peserta didik yang valid (angka minimal 6 digit).');
+        }
+        hash = await computeNisnNikHash(cleanNik);
       }
-      if (cleanNik.length < 6) {
-        throw new Error('Masukkan NIK peserta didik yang valid (angka minimal 6 digit).');
-      }
-      const hash = await computeNisnLookupHash(cleanName, cleanNik);
+
       if (!hash) {
-        throw new Error('Periksa kembali format Nama dan NIK peserta didik.');
+        throw new Error('Periksa kembali kata kunci pencarian yang dimasukkan.');
       }
+
       try {
         const snap = await getDoc(doc(db, 'nisn_lookup', hash));
         if (snap.exists()) {
@@ -1523,13 +1698,20 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
           return data.nisn ? String(data.nisn) : null;
         }
         if (!isFirestoreSeeded) {
-          const normalizedQueryName = cleanName.replace(/\s+/g, ' ').toLowerCase();
-          const sampleMatch = DEFAULT_STUDENTS_SAMPLE.find(
-            (s) =>
-              s.fullName.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedQueryName &&
-              normalizeNik(s.nik) === cleanNik
-          );
-          if (sampleMatch) return sampleMatch.nisn;
+          if (mode === 'nama') {
+            const normalizedQueryName = queryValue.trim().replace(/\s+/g, ' ').toLowerCase();
+            const sampleMatch = DEFAULT_STUDENTS_SAMPLE.find(
+              (s) =>
+                s.fullName.trim().replace(/\s+/g, ' ').toLowerCase() === normalizedQueryName
+            );
+            if (sampleMatch) return sampleMatch.nisn;
+          } else {
+            const cleanNik = normalizeNik(queryValue);
+            const sampleMatch = DEFAULT_STUDENTS_SAMPLE.find(
+              (s) => normalizeNik(s.nik) === cleanNik
+            );
+            if (sampleMatch) return sampleMatch.nisn;
+          }
         }
         return null;
       } catch (error) {
@@ -1541,23 +1723,35 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
 
   const syncNisnLookupIndex = useCallback(async (): Promise<number> => {
     assertAuthorizedAdmin();
-    const withNik = students.filter((s) => normalizeNik(s.nik).length >= 6);
-    if (withNik.length === 0) return 0;
+    if (students.length === 0) return 0;
 
     let synced = 0;
-    const chunkSize = 400;
-    for (let i = 0; i < withNik.length; i += chunkSize) {
-      const chunk = withNik.slice(i, i + chunkSize);
+    const chunkSize = 200;
+    for (let i = 0; i < students.length; i += chunkSize) {
+      const chunk = students.slice(i, i + chunkSize);
       const batch = writeBatch(db);
       for (const s of chunk) {
-        const hash = await computeNisnLookupHash(s.fullName, s.nik || '');
-        if (hash) {
-          batch.set(doc(db, 'nisn_lookup', hash), {
+        let indexed = false;
+        const nameHash = await computeNisnNameHash(s.fullName);
+        if (nameHash) {
+          batch.set(doc(db, 'nisn_lookup', nameHash), {
             nisn: s.nisn,
             updatedAt: serverTimestamp(),
           });
-          synced += 1;
+          indexed = true;
         }
+        const cleanNik = normalizeNik(s.nik);
+        if (cleanNik.length >= 6) {
+          const nikHash = await computeNisnNikHash(cleanNik);
+          if (nikHash) {
+            batch.set(doc(db, 'nisn_lookup', nikHash), {
+              nisn: s.nisn,
+              updatedAt: serverTimestamp(),
+            });
+            indexed = true;
+          }
+        }
+        if (indexed) synced += 1;
       }
       try {
         await batch.commit();
@@ -1572,7 +1766,9 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     user,
     authReady,
     userRole,
+    isPrimaryAdmin,
     isAuthorizedAdmin,
+    adminMarkers,
     loadingData,
     isFirestoreSeeded,
     siteMedia,
@@ -1593,6 +1789,9 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     markAnnouncementRead,
     markAllAnnouncementsRead,
     loginWithGoogle,
+    loginWithCredentials,
+    activateTimItAdmin,
+    revokeTimItAdmin,
     logout,
     runInitialSeed,
     saveSiteMedia,

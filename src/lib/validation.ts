@@ -84,20 +84,38 @@ export function normalizeNik(raw?: string): string {
   return (raw || '').replace(/\D/g, '').slice(0, 20);
 }
 
+async function sha256Hex(input: string): Promise<string> {
+  const encoded = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
+  const bytes = Array.from(new Uint8Array(hashBuffer));
+  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 /**
- * Computes a deterministic SHA-256 hex digest from student full name and NIK
- * so visitors can look up strictly the student's NISN without listing or
- * exposing any student PII in Firestore.
+ * Computes a deterministic SHA-256 hex digest from student full name alone
+ * so visitors can search NISN by Name only without exposing PII.
  */
+export async function computeNisnNameHash(fullName: string): Promise<string> {
+  const cleanName = fullName.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (cleanName.length < 2) return '';
+  return sha256Hex(`name|${cleanName}`);
+}
+
+/**
+ * Computes a deterministic SHA-256 hex digest from student NIK alone
+ * so visitors can search NISN by NIK only without exposing PII.
+ */
+export async function computeNisnNikHash(nik: string): Promise<string> {
+  const cleanNik = normalizeNik(nik);
+  if (cleanNik.length < 6) return '';
+  return sha256Hex(`nik|${cleanNik}`);
+}
+
 export async function computeNisnLookupHash(
   fullName: string,
   nik: string
 ): Promise<string> {
   const cleanName = fullName.trim().toLowerCase().replace(/\s+/g, ' ');
   const cleanNik = normalizeNik(nik);
-  const input = `${cleanName}|${cleanNik}`;
-  const encoded = new TextEncoder().encode(input);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', encoded);
-  const bytes = Array.from(new Uint8Array(hashBuffer));
-  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
+  return sha256Hex(`${cleanName}|${cleanNik}`);
 }

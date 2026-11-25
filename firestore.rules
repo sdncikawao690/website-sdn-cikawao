@@ -35,12 +35,17 @@ service cloud.firestore {
       return isVerifiedUser() && request.auth.token.email == 'sdncikawao690@gmail.com';
     }
 
+    function isListedAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
     function isAdmin() {
-      return isBootstrappedAdmin();
+      return isBootstrappedAdmin() || isListedAdmin();
     }
 
     function isStaff() {
-      return isBootstrappedAdmin();
+      return isAdmin();
     }
 
     function isValidTimestampOnCreate(data) {
@@ -376,7 +381,7 @@ service cloud.firestore {
     match /admins/{adminId} {
       allow get: if isSignedIn() && isValidId(adminId) && (request.auth.uid == adminId || isAdmin());
       allow list: if isBootstrappedAdmin();
-      allow create: if isAdmin() && isValidId(adminId) && isValidAdminMarker(incoming()) &&
+      allow create: if isBootstrappedAdmin() && isValidId(adminId) && isValidAdminMarker(incoming()) &&
         incoming().uid == adminId && incoming().createdAt == request.time;
       allow update: if false;
       allow delete: if isBootstrappedAdmin() && isValidId(adminId);
@@ -396,16 +401,16 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow get: if isBootstrappedAdmin() && isValidId(userId);
-      allow list: if isBootstrappedAdmin();
-      allow create: if isBootstrappedAdmin() && isValidId(userId) && isValidUserAccount(incoming()) &&
+      allow get: if isAdmin() && isValidId(userId);
+      allow list: if isAdmin();
+      allow create: if isAdmin() && isValidId(userId) && isValidUserAccount(incoming()) &&
         isValidTimestampOnCreate(incoming());
-      allow update: if isBootstrappedAdmin() && isValidId(userId) && isValidUserAccount(incoming()) &&
+      allow update: if isAdmin() && isValidId(userId) && isValidUserAccount(incoming()) &&
         isValidTimestampOnUpdate(incoming()) &&
         incoming().diff(existing()).affectedKeys().hasOnly([
           'uid', 'displayName', 'email', 'role', 'nipOrNik', 'rombel', 'phone', 'photoUrl', 'linkedStudentId', 'status', 'updatedAt'
         ]);
-      allow delete: if isBootstrappedAdmin() && isValidId(userId);
+      allow delete: if isAdmin() && isValidId(userId);
     }
 
     match /teachers/{teacherId} {
@@ -423,11 +428,11 @@ service cloud.firestore {
     }
 
     match /students/{studentId} {
-      allow get: if isBootstrappedAdmin() && isValidId(studentId);
-      allow list: if isBootstrappedAdmin();
-      allow create: if isBootstrappedAdmin() && isValidId(studentId) && isValidStudentRecord(incoming()) &&
+      allow get: if isAdmin() && isValidId(studentId);
+      allow list: if isAdmin();
+      allow create: if isAdmin() && isValidId(studentId) && isValidStudentRecord(incoming()) &&
         isValidTimestampOnCreate(incoming());
-      allow update: if isBootstrappedAdmin() && isValidId(studentId) && isValidStudentRecord(incoming()) &&
+      allow update: if isAdmin() && isValidId(studentId) && isValidStudentRecord(incoming()) &&
         isValidTimestampOnUpdate(incoming()) &&
         incoming().diff(existing()).affectedKeys().hasOnly([
           'nisn', 'nik', 'fullName', 'rombel', 'gender', 'parentName', 'parentEmail',
@@ -435,7 +440,7 @@ service cloud.firestore {
           'capaianP5', 'academicNote', 'photoUrl', 'videoUrl', 'documentUrl',
           'updatedBy', 'updatedAt'
         ]);
-      allow delete: if isBootstrappedAdmin() && isValidId(studentId);
+      allow delete: if isAdmin() && isValidId(studentId);
     }
 
     match /news/{newsId} {
@@ -522,13 +527,13 @@ service cloud.firestore {
     }
 
     match /siloka_tickets/{ticketId} {
-      allow get: if isBootstrappedAdmin() && isValidId(ticketId);
-      allow list: if isBootstrappedAdmin();
-      allow create: if isBootstrappedAdmin() && isValidId(ticketId) && isValidSilokaTicket(incoming()) &&
+      allow get: if isAdmin() && isValidId(ticketId);
+      allow list: if isAdmin();
+      allow create: if isAdmin() && isValidId(ticketId) && isValidSilokaTicket(incoming()) &&
         incoming().reporterUid == request.auth.uid &&
         incoming().status == 'Menunggu' &&
         isValidTimestampOnCreate(incoming());
-      allow update: if isBootstrappedAdmin() && isValidId(ticketId) && isValidSilokaTicket(incoming()) &&
+      allow update: if isAdmin() && isValidId(ticketId) && isValidSilokaTicket(incoming()) &&
         incoming().reporterUid == existing().reporterUid &&
         incoming().ticketCode == existing().ticketCode &&
         isValidTimestampOnUpdate(incoming()) &&
@@ -537,33 +542,33 @@ service cloud.firestore {
           'photoUrl', 'videoUrl', 'documentUrl', 'documentName',
           'responsePhotoUrl', 'responseDocUrl', 'responseDocName', 'updatedAt'
         ]);
-      allow delete: if isBootstrappedAdmin() && isValidId(ticketId);
+      allow delete: if isAdmin() && isValidId(ticketId);
     }
 
     match /siloka_documents/{docId} {
       allow get: if isValidId(docId);
       allow list: if true;
-      allow create: if isBootstrappedAdmin() && isValidId(docId) && isValidSilokaDocument(incoming()) &&
+      allow create: if isAdmin() && isValidId(docId) && isValidSilokaDocument(incoming()) &&
         incoming().authorUid == request.auth.uid &&
         isValidTimestampOnCreate(incoming());
-      allow update: if isBootstrappedAdmin() && isValidId(docId) && isValidSilokaDocument(incoming()) &&
+      allow update: if isAdmin() && isValidId(docId) && isValidSilokaDocument(incoming()) &&
         incoming().authorUid == existing().authorUid &&
         isValidTimestampOnUpdate(incoming()) &&
         incoming().diff(existing()).affectedKeys().hasOnly([
           'pillar', 'title', 'description', 'fileUrl', 'fileName', 'fileSizeLabel', 'uploadedBy', 'updatedAt'
         ]);
-      allow delete: if isBootstrappedAdmin() && isValidId(docId);
+      allow delete: if isAdmin() && isValidId(docId);
     }
 
     match /nisn_lookup/{lookupId} {
       allow get: if isValidId(lookupId);
       allow list: if false;
-      allow create: if isBootstrappedAdmin() && isValidId(lookupId) && isValidNisnLookup(incoming()) &&
+      allow create: if isAdmin() && isValidId(lookupId) && isValidNisnLookup(incoming()) &&
         incoming().updatedAt == request.time;
-      allow update: if isBootstrappedAdmin() && isValidId(lookupId) && isValidNisnLookup(incoming()) &&
+      allow update: if isAdmin() && isValidId(lookupId) && isValidNisnLookup(incoming()) &&
         incoming().updatedAt == request.time &&
         incoming().diff(existing()).affectedKeys().hasOnly(['nisn', 'updatedAt']);
-      allow delete: if isBootstrappedAdmin() && isValidId(lookupId);
+      allow delete: if isAdmin() && isValidId(lookupId);
     }
 
     match /test/connection {

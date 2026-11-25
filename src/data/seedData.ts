@@ -6,7 +6,11 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { computeNisnLookupHash, normalizeNik } from '../lib/validation';
+import {
+  computeNisnNameHash,
+  computeNisnNikHash,
+  normalizeNik,
+} from '../lib/validation';
 import {
   GENERATED_IMAGES,
   SCHOOL_INFO,
@@ -648,11 +652,19 @@ export async function seedInitialSchoolData(
       });
       ops++;
     }
+    const nameHash = await computeNisnNameHash(stuData.fullName);
+    if (nameHash) {
+      batch.set(doc(db, 'nisn_lookup', nameHash), {
+        nisn: stuData.nisn,
+        updatedAt: ts,
+      });
+      ops++;
+    }
     const cleanNik = normalizeNik(stuData.nik);
     if (cleanNik.length >= 6) {
-      const lookupHash = await computeNisnLookupHash(stuData.fullName, cleanNik);
-      if (lookupHash) {
-        batch.set(doc(db, 'nisn_lookup', lookupHash), {
+      const nikHash = await computeNisnNikHash(cleanNik);
+      if (nikHash) {
+        batch.set(doc(db, 'nisn_lookup', nikHash), {
           nisn: stuData.nisn,
           updatedAt: ts,
         });

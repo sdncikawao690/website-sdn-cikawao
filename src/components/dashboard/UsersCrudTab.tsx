@@ -1,7 +1,25 @@
 import React, { useMemo, useState } from 'react';
-import { Edit2, Plus, Search, Trash2, X } from 'lucide-react';
+import {
+  CheckCircle2,
+  Edit2,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Plus,
+  Search,
+  ShieldCheck,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useSchool } from '../../context/SchoolContext';
-import type { UserAccount, UserRole, UserStatus } from '../../types/school';
+import { FIREBASE_AUTH_PROVIDERS_URL, FirebaseAuthUiError } from '../../lib/firebase';
+import {
+  TIM_IT_ACCOUNT,
+  type UserAccount,
+  type UserRole,
+  type UserStatus,
+} from '../../types/school';
 import { Icon3D } from '../Icon3D';
 import { MediaPicker } from '../MediaPicker';
 import { SafeImage } from '../SafeImage';
@@ -21,7 +39,16 @@ const EMPTY_FORM: Omit<UserAccount, 'createdAt' | 'updatedAt'> = {
 };
 
 export function UsersCrudTab() {
-  const { users, students, saveUser, removeUser } = useSchool();
+  const {
+    users,
+    students,
+    isPrimaryAdmin,
+    adminMarkers,
+    activateTimItAdmin,
+    revokeTimItAdmin,
+    saveUser,
+    removeUser,
+  } = useSchool();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,6 +56,65 @@ export function UsersCrudTab() {
   const [form, setForm] = useState<Omit<UserAccount, 'createdAt' | 'updatedAt'>>(EMPTY_FORM);
   const [busy, setBusy] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const [timItPassword, setTimItPassword] = useState('');
+  const [showTimItPassword, setShowTimItPassword] = useState(false);
+  const [timItBusy, setTimItBusy] = useState(false);
+  const [timItError, setTimItError] = useState<string | null>(null);
+  const [timItErrorCode, setTimItErrorCode] = useState<string | null>(null);
+  const [timItSuccess, setTimItSuccess] = useState<string | null>(null);
+
+  const timItMarker = useMemo(
+    () =>
+      adminMarkers.find(
+        (m) => m.email.toLowerCase() === TIM_IT_ACCOUNT.internalEmail
+      ) || null,
+    [adminMarkers]
+  );
+
+  const handleActivateTimIt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTimItError(null);
+    setTimItErrorCode(null);
+    setTimItSuccess(null);
+    setTimItBusy(true);
+    try {
+      await activateTimItAdmin(timItPassword);
+      setTimItPassword('');
+      setTimItSuccess(
+        `Akses login Tim IT aktif! Sekarang dapat masuk ke Dashboard Admin menggunakan username "${TIM_IT_ACCOUNT.username}" dan password yang baru saja Anda tetapkan.`
+      );
+    } catch (err) {
+      if (err instanceof FirebaseAuthUiError) {
+        setTimItErrorCode(err.code);
+        setTimItError(err.message);
+      } else {
+        setTimItError(
+          err instanceof Error ? err.message : 'Gagal mengaktifkan akses login Tim IT.'
+        );
+      }
+    } finally {
+      setTimItBusy(false);
+    }
+  };
+
+  const handleRevokeTimIt = async () => {
+    if (!timItMarker) return;
+    setTimItError(null);
+    setTimItErrorCode(null);
+    setTimItSuccess(null);
+    setTimItBusy(true);
+    try {
+      await revokeTimItAdmin(timItMarker.uid);
+      setTimItSuccess('Akses admin Tim IT berhasil dinonaktifkan.');
+    } catch (err) {
+      setTimItError(
+        err instanceof Error ? err.message : 'Gagal menonaktifkan akses Tim IT.'
+      );
+    } finally {
+      setTimItBusy(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -116,6 +202,142 @@ export function UsersCrudTab() {
           Tambah Pengguna
         </button>
       </div>
+
+      {/* Tim IT Username & Password Admin Access Card (Primary Admin Only) */}
+      {isPrimaryAdmin && (
+        <div className="bg-gradient-to-br from-sky-50 via-white to-indigo-50/70 border-2 border-sky-200 rounded-2xl p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <KeyRound className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-extrabold text-slate-900 font-display">
+                    Akses Login Tim IT SDN Cikawao (User &amp; Password)
+                  </h3>
+                  {timItMarker ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-bold bg-emerald-100 text-emerald-800 rounded-lg border border-emerald-200">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Aktif
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] font-bold bg-amber-100 text-amber-900 rounded-lg border border-amber-200">
+                      Belum Diaktifkan
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  Username login:{' '}
+                  <span className="font-mono font-bold text-slate-900 bg-white px-2 py-0.5 rounded border border-sky-200">
+                    {TIM_IT_ACCOUNT.username}
+                  </span>{' '}
+                  · Email internal Auth:{' '}
+                  <span className="font-mono text-slate-700">{TIM_IT_ACCOUNT.internalEmail}</span>
+                </p>
+              </div>
+            </div>
+
+            {timItMarker && (
+              <button
+                type="button"
+                disabled={timItBusy}
+                onClick={() => void handleRevokeTimIt()}
+                className="px-3 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl cursor-pointer self-start sm:self-center disabled:opacity-60"
+              >
+                Nonaktifkan Akses Tim IT
+              </button>
+            )}
+          </div>
+
+          {timItError && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-900 text-xs rounded-xl space-y-2">
+              <p className="font-semibold">{timItError}</p>
+              {timItErrorCode === 'auth/operation-not-allowed' && (
+                <p className="text-[11px] text-rose-950 leading-relaxed">
+                  Buka{' '}
+                  <a
+                    href={FIREBASE_AUTH_PROVIDERS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-bold underline inline-flex items-center gap-1 text-sky-700"
+                  >
+                    Firebase Console — Sign-in Providers
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  , aktifkan penyedia <strong>Email/Password</strong> lalu simpan, kemudian klik
+                  tombol aktivasi di bawah sekali lagi.
+                </p>
+              )}
+            </div>
+          )}
+
+          {timItSuccess && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold rounded-xl flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>{timItSuccess}</span>
+            </div>
+          )}
+
+          <form
+            onSubmit={(e) => void handleActivateTimIt(e)}
+            className="flex flex-col sm:flex-row sm:items-end gap-3"
+          >
+            <div className="flex-1">
+              <label
+                htmlFor="timit-setup-password"
+                className="block text-xs font-bold text-slate-700 mb-1"
+              >
+                {timItMarker
+                  ? 'Tautkan / Verifikasi Ulang Password Tim IT'
+                  : 'Tetapkan Password Akun Tim IT'}
+              </label>
+              <div className="relative">
+                <input
+                  id="timit-setup-password"
+                  type={showTimItPassword ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  maxLength={64}
+                  value={timItPassword}
+                  onChange={(e) => setTimItPassword(e.target.value)}
+                  placeholder="Masukkan password untuk login Tim IT (minimal 6 karakter)"
+                  className="w-full pl-3.5 pr-10 py-2 text-sm border-2 border-sky-200 bg-white rounded-xl focus:outline-none focus:border-sky-500"
+                />
+                <button
+                  type="button"
+                  aria-label={showTimItPassword ? 'Sembunyikan password' : 'Lihat password'}
+                  onClick={() => setShowTimItPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer"
+                >
+                  {showTimItPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={timItBusy}
+              className="px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-xl btn-3d-emerald whitespace-nowrap shrink-0 cursor-pointer disabled:opacity-60"
+            >
+              {timItBusy
+                ? 'Mengaktifkan...'
+                : timItMarker
+                  ? 'Tautkan Ulang Akun Tim IT'
+                  : 'Aktifkan Akun Tim IT'}
+            </button>
+          </form>
+
+          {timItMarker && (
+            <p className="text-[11px] text-slate-500 font-mono">
+              UID Admin Tim IT Terdaftar: {timItMarker.uid}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border-2 border-purple-200 rounded-2xl p-3">

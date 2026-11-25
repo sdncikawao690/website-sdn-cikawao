@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShieldAlert, X } from 'lucide-react';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { DashboardLayout } from './components/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Icon3D } from './components/Icon3D';
@@ -7,7 +8,7 @@ import { Navbar } from './components/Navbar';
 import { NotificationDrawer } from './components/NotificationDrawer';
 import { PublicPortal } from './components/PublicPortal';
 import { SchoolProvider, useSchool } from './context/SchoolContext';
-import { SCHOOL_INFO, type PublicTabId } from './types/school';
+import { SCHOOL_INFO, TIM_IT_ACCOUNT, type PublicTabId } from './types/school';
 
 function AppShell() {
   const {
@@ -23,6 +24,7 @@ function AppShell() {
   const [publicTab, setPublicTab] = useState<PublicTabId>('beranda');
   const [dashboardTab, setDashboardTab] = useState<string>('overview');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [visitorNoticeDismissed, setVisitorNoticeDismissed] = useState(false);
 
   const handleSelectPublicTab = (tab: PublicTabId) => {
@@ -50,6 +52,7 @@ function AppShell() {
           setViewMode(mode);
         }}
         onSelectPublicTab={handleSelectPublicTab}
+        onOpenLogin={() => setLoginModalOpen(true)}
       />
 
       {authReady && user && !isAuthorizedAdmin && !visitorNoticeDismissed && (
@@ -58,10 +61,23 @@ function AppShell() {
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
               <span>
-                <strong>Mode Pengunjung (Hanya Lihat):</strong> Anda masuk dengan{' '}
-                <span className="font-mono">{user.email}</span>. Akses tambah/ubah dashboard
-                khusus untuk email admin resmi{' '}
-                <span className="font-mono font-bold">{SCHOOL_INFO.email}</span>.
+                {user.email?.toLowerCase() === TIM_IT_ACCOUNT.internalEmail ? (
+                  <>
+                    <strong>Akun Tim IT Belum Ditautkan:</strong> UID{' '}
+                    <span className="font-mono font-bold">{user.uid}</span> belum diaktifkan di
+                    daftar admin. Masuk sekali dengan Google{' '}
+                    <span className="font-mono font-bold">{SCHOOL_INFO.email}</span> lalu klik{' '}
+                    <strong>Aktifkan Akun Tim IT</strong> di menu Manajemen Pengguna.
+                  </>
+                ) : (
+                  <>
+                    <strong>Mode Pengunjung (Hanya Lihat):</strong> Anda masuk dengan{' '}
+                    <span className="font-mono">{user.email}</span>. Akses tambah/ubah dashboard
+                    khusus untuk admin resmi{' '}
+                    <span className="font-mono font-bold">{SCHOOL_INFO.email}</span> atau akun{' '}
+                    <strong>{TIM_IT_ACCOUNT.displayName}</strong> aktif.
+                  </>
+                )}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -104,6 +120,12 @@ function AppShell() {
       <NotificationDrawer
         open={notifOpen}
         onClose={() => setNotifOpen(false)}
+      />
+
+      <AdminLoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccessDashboard={() => setViewMode('dashboard')}
       />
 
       {/* Automated Real-Time Parent Notification Toast */}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
 import { useSchool } from '../context/SchoolContext';
-import { SCHOOL_INFO } from '../types/school';
+import { SCHOOL_INFO, TIM_IT_ACCOUNT } from '../types/school';
 import { Icon3D, type Icon3DName } from './Icon3D';
 import { AnnouncementsTab } from './dashboard/AnnouncementsTab';
 import { JabarBeraksiTab } from './dashboard/JabarBeraksiTab';
@@ -117,11 +117,12 @@ export function DashboardLayout({
             Akses Dashboard Terbatas
           </h2>
           <p className="text-xs text-slate-600 leading-relaxed">
-            Hanya email admin resmi{' '}
+            Hanya admin resmi{' '}
             <span className="font-mono font-bold text-slate-900">
               {SCHOOL_INFO.email}
             </span>{' '}
-            yang diizinkan untuk menambah dan mengubah data dashboard SDN Cikawao.
+            atau akun <strong>{TIM_IT_ACCOUNT.displayName}</strong> aktif yang diizinkan
+            untuk menambah dan mengubah data dashboard SDN Cikawao.
           </p>
           <button
             type="button"
@@ -169,9 +170,16 @@ export function DashboardLayout({
             </div>
           </div>
           <p className="text-sm font-extrabold truncate mt-0.5 font-display">
-            {user?.displayName || 'Pengguna Portal'}
+            {user?.displayName ||
+              (user?.email?.toLowerCase() === TIM_IT_ACCOUNT.internalEmail
+                ? TIM_IT_ACCOUNT.displayName
+                : 'Pengguna Portal')}
           </p>
-          <p className="text-xs text-sky-100 truncate">{user?.email}</p>
+          <p className="text-xs text-sky-100 truncate">
+            {user?.email?.toLowerCase() === TIM_IT_ACCOUNT.internalEmail
+              ? `Username: ${TIM_IT_ACCOUNT.username}`
+              : user?.email}
+          </p>
         </div>
 
         <nav

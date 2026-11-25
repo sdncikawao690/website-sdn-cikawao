@@ -208,8 +208,8 @@ export function StudentsAcademicTab() {
       const count = await syncNisnLookupIndex();
       setExcelSuccess(
         count > 0
-          ? `Berhasil menyinkronkan ${count} indeks Cek NISN untuk tab publik Peserta Didik.`
-          : 'Belum ada data siswa yang memiliki NIK (minimal 6 digit) untuk disinkronkan.'
+          ? `Berhasil menyinkronkan ${count} data siswa ke indeks Cek NISN (Nama & NIK).`
+          : 'Belum ada data siswa yang dapat disinkronkan ke indeks Cek NISN.'
       );
     } catch (err) {
       setExcelError(
@@ -296,7 +296,8 @@ export function StudentsAcademicTab() {
               <span className="font-mono">Nama Lengkap</span>,{' '}
               <span className="font-mono">Rombel</span>,{' '}
               <span className="font-mono">Jenis Kelamin (L/P)</span>, dan nilai untuk memperbarui
-              atau menambahkan banyak siswa sekaligus (otomatis terindeks untuk pencarian NISN publik).
+              atau menambahkan banyak siswa sekaligus (otomatis terindeks untuk pencarian NISN publik
+              berdasarkan Nama Lengkap atau NIK).
             </span>
           </div>
         </div>

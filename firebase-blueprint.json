@@ -825,7 +825,7 @@
     },
     "NisnLookup": {
       "title": "NisnLookup",
-      "description": "Blind SHA-256 lookup index mapping hashed (fullName + NIK) solely to student NISN without exposing PII.",
+      "description": "Blind SHA-256 lookup index mapping hashed fullName or NIK solely to student NISN without exposing PII.",
       "type": "object",
       "properties": {
         "nisn": {
@@ -893,7 +893,7 @@
     },
     "/nisn_lookup/{lookupId}": {
       "schema": { "$ref": "#/entities/NisnLookup" },
-      "description": "Blind SHA-256 lookup table returning only NISN for matching student name and NIK."
+      "description": "Blind SHA-256 lookup table returning only NISN for matching student name or NIK."
     }
   }
 }

@@ -8,6 +8,7 @@ interface NavbarProps {
   activePublicTab: PublicTabId;
   onSwitchView: (mode: 'public' | 'dashboard') => void;
   onSelectPublicTab: (tab: PublicTabId) => void;
+  onOpenLogin: () => void;
 }
 
 const NAV_ITEMS: Array<{
@@ -65,20 +66,15 @@ export function Navbar({
   activePublicTab,
   onSwitchView,
   onSelectPublicTab,
+  onOpenLogin,
 }: NavbarProps) {
-  const { user, isAuthorizedAdmin, loginWithGoogle, logout } = useSchool();
+  const { user, isAuthorizedAdmin, logout } = useSchool();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
 
   const handlePrimaryAction = async () => {
     if (!user) {
-      setAuthBusy(true);
-      try {
-        await loginWithGoogle();
-        onSwitchView('dashboard');
-      } finally {
-        setAuthBusy(false);
-      }
+      onOpenLogin();
       return;
     }
     if (!isAuthorizedAdmin) {

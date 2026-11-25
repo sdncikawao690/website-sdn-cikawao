@@ -166,6 +166,13 @@ export interface SiteMediaConfig {
   updatedAt?: Timestamp;
 }
 
+export interface AdminMarker {
+  uid: string;
+  email: string;
+  assignedBy: string;
+  createdAt?: Timestamp;
+}
+
 export interface UserAccount {
   id: string;
   uid?: string;
@@ -379,6 +386,13 @@ export const SCHOOL_INFO = {
     'Mengoptimalkan kompetensi pendidik melalui supervisi akademik berkelanjutan dan penguatan tata kelola sekolah yang transparan.',
     'Membangun kemitraan harmonis antara sekolah, orang tua murid, dan masyarakat melalui komunikasi digital dan layanan publik yang responsif.',
   ],
+} as const;
+
+export const TIM_IT_ACCOUNT = {
+  username: 'tim it sdn cikawao',
+  aliases: ['tim it sdn cikawao', 'timit', 'tim it', 'timit@sdncikawao.sch.id'],
+  internalEmail: 'timit@sdncikawao.sch.id',
+  displayName: 'Tim IT SDN Cikawao',
 } as const;
 
 export const GENERATED_IMAGES = {
