@@ -1,0 +1,6 @@
+{
+  "name": "Portal Resmi SDN Cikawao — Kab. Sumedang",
+  "description": "Portal informasi, manajemen akademik Kurikulum Merdeka, PKKS, Jabar Beraksi, dan layanan pengaduan masyarakat SILOKA SDN Cikawao (NPSN 20208591), Kec. Pamulihan, Kab. Sumedang.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

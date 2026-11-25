@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.btn-3d-amber {
+  box-shadow: 0 4px 0 #c2410c;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-3d-amber:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #c2410c;
+}
+.btn-3d-amber:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #c2410c;
+}
+
+.btn-3d-sky {
+  box-shadow: 0 4px 0 #0369a1;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-3d-sky:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #0369a1;
+}
+.btn-3d-sky:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #0369a1;
+}
+
+.btn-3d-emerald {
+  box-shadow: 0 4px 0 #047857;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-3d-emerald:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #047857;
+}
+.btn-3d-emerald:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #047857;
+}
+
+@keyframes visi-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.visi-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: visi-marquee 30s linear infinite;
+  will-change: transform;
+}
+
+.visi-marquee-wrapper:hover .visi-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visi-marquee-track {
+    animation: none;
+  }
+}
+

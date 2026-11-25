@@ -1,0 +1,899 @@
+{
+  "entities": {
+    "AdminMarker": {
+      "title": "AdminMarker",
+      "description": "Authoritative marker document granting admin privileges to a verified UID.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 150
+        },
+        "assignedBy": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "assignedBy", "createdAt"]
+    },
+    "SiteMediaConfig": {
+      "title": "SiteMediaConfig",
+      "description": "School-wide visual media configuration (campus hero photo, principal portrait, profile video, school profile document).",
+      "type": "object",
+      "properties": {
+        "heroImageUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "heroVideoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "principalPhotoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "schoolProfileDocUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["heroImageUrl", "principalPhotoUrl", "updatedBy", "createdAt", "updatedAt"]
+    },
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Portal user account for Kepala Sekolah/Admin, Guru, and Orang Tua Murid.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 150
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "guru", "orangtua"]
+        },
+        "nipOrNik": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "rombel": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 25
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "linkedStudentId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]*$"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["aktif", "nonaktif"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["displayName", "email", "role", "status", "createdAt", "updatedAt"]
+    },
+    "TeacherProfile": {
+      "title": "TeacherProfile",
+      "description": "Public directory entry for SDN Cikawao Principal and 8 Teachers (non-PII).",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "nip": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "position": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "rank": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "rombel": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Aktif", "Cuti"]
+        },
+        "displayOrder": {
+          "type": "number"
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["name", "position", "rombel", "status", "displayOrder", "createdAt", "updatedAt"]
+    },
+    "StudentRecord": {
+      "title": "StudentRecord",
+      "description": "Integrated student profile and real-time Kurikulum Merdeka academic monitoring.",
+      "type": "object",
+      "properties": {
+        "nisn": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 20,
+          "pattern": "^[0-9a-zA-Z\\-]+$"
+        },
+        "nik": {
+          "type": "string",
+          "maxLength": 20,
+          "pattern": "^[0-9]*$"
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "rombel": {
+          "type": "string",
+          "enum": ["Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"]
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["L", "P"]
+        },
+        "parentName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "parentEmail": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "teacherEmail": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "attendancePercent": {
+          "type": "number"
+        },
+        "nilaiFormatif": {
+          "type": "number"
+        },
+        "nilaiSumatif": {
+          "type": "number"
+        },
+        "capaianP5": {
+          "type": "string",
+          "enum": ["Mulai Berkembang", "Sedang Berkembang", "Berkembang Sesuai Harapan", "Sangat Berkembang"]
+        },
+        "academicNote": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "nisn",
+        "fullName",
+        "rombel",
+        "gender",
+        "parentName",
+        "parentEmail",
+        "teacherEmail",
+        "attendancePercent",
+        "nilaiFormatif",
+        "nilaiSumatif",
+        "capaianP5",
+        "academicNote",
+        "updatedBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "NewsArticle": {
+      "title": "NewsArticle",
+      "description": "School news and Kegiatan Belajar Mengajar (KBM) updates with photo, video, and documentation.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 160
+        },
+        "category": {
+          "type": "string",
+          "enum": ["KBM", "Prestasi", "Kurikulum Merdeka", "Kegiatan Sekolah"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 320
+        },
+        "content": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 4000
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "publishedDate": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 30
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["title", "category", "summary", "content", "imageUrl", "authorName", "authorUid", "publishedDate", "createdAt", "updatedAt"]
+    },
+    "GalleryItem": {
+      "title": "GalleryItem",
+      "description": "School photo and video gallery accessible to parents and the public.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "enum": ["KBM", "Ekstrakurikuler", "Seni Budaya", "Lingkungan Sekolah"]
+        },
+        "mediaType": {
+          "type": "string",
+          "enum": ["foto", "video"]
+        },
+        "caption": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 300
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "takenDate": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 30
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["title", "category", "caption", "imageUrl", "takenDate", "authorUid", "createdAt", "updatedAt"]
+    },
+    "PkksItem": {
+      "title": "PkksItem",
+      "description": "Penilaian Kinerja Kepala Sekolah (PKKS) component and photo/video/document evidence tracking.",
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string",
+          "enum": [
+            "Kepribadian & Sosial",
+            "Kepemimpinan Pembelajaran",
+            "Pengembangan Sekolah",
+            "Manajemen Sumber Daya",
+            "Kewirausahaan",
+            "Supervisi Guru & Tendik"
+          ]
+        },
+        "indicatorCode": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 20
+        },
+        "indicatorTitle": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 180
+        },
+        "targetScore": {
+          "type": "number"
+        },
+        "achievedScore": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Terpenuhi", "Proses Verifikasi", "Perlu Lengkapi"]
+        },
+        "evidenceSummary": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 400
+        },
+        "evidenceUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "evidencePhotoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "evidenceVideoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "component",
+        "indicatorCode",
+        "indicatorTitle",
+        "targetScore",
+        "achievedScore",
+        "status",
+        "evidenceSummary",
+        "updatedBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "EkskulReport": {
+      "title": "EkskulReport",
+      "description": "Jabar Beraksi transparent extracurricular activity reporting with photo, video, and document.",
+      "type": "object",
+      "properties": {
+        "ekskulName": {
+          "type": "string",
+          "enum": [
+            "Pendidikan Karakter",
+            "Digitalisasi Pembelajaran",
+            "Kualitas Dapodik",
+            "SPMI",
+            "Analisis Daya Tampung",
+            "Pramuka",
+            "Seni Angklung & Tari Sunda",
+            "Paskibra",
+            "Pencak Silat",
+            "Olahraga & Atletik",
+            "BTQ & Keagamaan",
+            "Literasi & PMR"
+          ]
+        },
+        "activityTitle": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 150
+        },
+        "coachName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "schedule": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 80
+        },
+        "participantCount": {
+          "type": "number"
+        },
+        "activityDate": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 30
+        },
+        "reportSummary": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 600
+        },
+        "transparencyNote": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ekskulName",
+        "activityTitle",
+        "coachName",
+        "schedule",
+        "participantCount",
+        "activityDate",
+        "reportSummary",
+        "authorUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Automated parent notification announcements with optional photo, video, and circular document.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 150
+        },
+        "message": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 1000
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["Penting", "Mendesak", "Informasi"]
+        },
+        "targetRombel": {
+          "type": "string",
+          "enum": ["Semua Kelas", "Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"]
+        },
+        "autoNotifyParents": {
+          "type": "boolean"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["title", "message", "priority", "targetRombel", "autoNotifyParents", "isActive", "authorName", "authorUid", "createdAt", "updatedAt"]
+    },
+    "SilokaTicket": {
+      "title": "SilokaTicket",
+      "description": "SILOKA responsive community complaint and feedback ticket with photo/video/documentation attachments.",
+      "type": "object",
+      "properties": {
+        "ticketCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 30,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "reporterUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "reporterName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "reporterEmail": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 150
+        },
+        "reporterPhone": {
+          "type": "string",
+          "maxLength": 25
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Perencanaan",
+            "Pengorganisasian",
+            "Pelaksana",
+            "Program Unggulan",
+            "Evaluasi",
+            "Layanan Akademik",
+            "Sarana Prasarana",
+            "Kesiswaan",
+            "Ekstrakurikuler",
+            "Saran & Aspirasi"
+          ]
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 160
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 1500
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "documentUrl": {
+          "type": "string",
+          "maxLength": 200000
+        },
+        "documentName": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Menunggu", "Diproses", "Selesai"]
+        },
+        "officialResponse": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "responsePhotoUrl": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "responseDocUrl": {
+          "type": "string",
+          "maxLength": 200000
+        },
+        "responseDocName": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "respondedBy": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "ticketCode",
+        "reporterUid",
+        "reporterName",
+        "reporterEmail",
+        "category",
+        "subject",
+        "description",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SilokaDocument": {
+      "title": "SilokaDocument",
+      "description": "Uploaded school management documents categorized under the 5 SILOKA pillars (Perencanaan, Pengorganisasian, Pelaksana, Program Unggulan, Evaluasi).",
+      "type": "object",
+      "properties": {
+        "pillar": {
+          "type": "string",
+          "enum": [
+            "Perencanaan",
+            "Pengorganisasian",
+            "Pelaksana",
+            "Program Unggulan",
+            "Evaluasi"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "fileUrl": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 350000
+        },
+        "fileName": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "fileSizeLabel": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "uploadedBy": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "pillar",
+        "title",
+        "fileUrl",
+        "uploadedBy",
+        "authorUid",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "NisnLookup": {
+      "title": "NisnLookup",
+      "description": "Blind SHA-256 lookup index mapping hashed (fullName + NIK) solely to student NISN without exposing PII.",
+      "type": "object",
+      "properties": {
+        "nisn": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 20,
+          "pattern": "^[0-9a-zA-Z\\-]+$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["nisn", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{adminId}": {
+      "schema": { "$ref": "#/entities/AdminMarker" },
+      "description": "Trusted admin role marker documents."
+    },
+    "/site_settings/{settingId}": {
+      "schema": { "$ref": "#/entities/SiteMediaConfig" },
+      "description": "School visual branding, campus hero photo, principal photo, profile video, and official document."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserAccount" },
+      "description": "User accounts for admin, teachers, and parents."
+    },
+    "/teachers/{teacherId}": {
+      "schema": { "$ref": "#/entities/TeacherProfile" },
+      "description": "Public directory of Principal and 8 teachers at SDN Cikawao."
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/StudentRecord" },
+      "description": "Student roster and real-time academic progress records."
+    },
+    "/news/{newsId}": {
+      "schema": { "$ref": "#/entities/NewsArticle" },
+      "description": "School news and KBM learning updates."
+    },
+    "/gallery/{galleryId}": {
+      "schema": { "$ref": "#/entities/GalleryItem" },
+      "description": "School photo and video gallery."
+    },
+    "/pkks_items/{itemId}": {
+      "schema": { "$ref": "#/entities/PkksItem" },
+      "description": "PKKS indicators and evidence tracking."
+    },
+    "/ekskul_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/EkskulReport" },
+      "description": "Jabar Beraksi extracurricular activity reports."
+    },
+    "/announcements/{announcementId}": {
+      "schema": { "$ref": "#/entities/Announcement" },
+      "description": "Important school announcements with automated parent notification flags."
+    },
+    "/siloka_tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/SilokaTicket" },
+      "description": "SILOKA public complaint and feedback tickets."
+    },
+    "/siloka_documents/{docId}": {
+      "schema": { "$ref": "#/entities/SilokaDocument" },
+      "description": "Uploaded files for Perencanaan, Pengorganisasian, Pelaksana, Program Unggulan, and Evaluasi in SILOKA."
+    },
+    "/nisn_lookup/{lookupId}": {
+      "schema": { "$ref": "#/entities/NisnLookup" },
+      "description": "Blind SHA-256 lookup table returning only NISN for matching student name and NIK."
+    }
+  }
+}
