@@ -17,6 +17,7 @@ import {
   Play,
   Search,
   ShieldCheck,
+  Sparkles,
   Users,
   Video,
   X,
@@ -284,7 +285,7 @@ export function PublicPortal({
           <section className="bg-gradient-to-br from-sky-100/80 via-white to-amber-100/70 border-b border-sky-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-                <div className="lg:col-span-7 flex flex-col justify-center">
+                <div className="lg:col-span-7 min-w-0 flex flex-col justify-center">
                   <div className="flex items-center gap-3.5 mb-4">
                     <div className="w-14 h-14 rounded-2xl logo-light-badge bg-white border-2 border-sky-200 p-1.5 shadow-sm shrink-0 flex items-center justify-center">
                       <img
@@ -309,16 +310,38 @@ export function PublicPortal({
                   </div>
 
                   <h1
-                    className="font-display font-extrabold tracking-tight text-slate-900 text-balance mb-5"
-                    style={{
-                      fontSize: 'clamp(2.15rem, 3.6vw, 3.15rem)',
-                      lineHeight: 1.12,
-                    }}
+                    aria-label="Sekolah Dasar Negeri Cikawao, Ceria, Cerdas, dan Berkarakter"
+                    className="w-full mb-5 rounded-2xl border-2 border-sky-200 bg-white/90 shadow-md px-3 py-4 sm:py-5 overflow-hidden hero-marquee-wrapper"
                   >
-                    Sekolah Dasar Negeri Cikawao,{' '}
-                    <span className="bg-gradient-to-r from-sky-600 via-emerald-600 to-amber-600 bg-clip-text text-transparent">
-                      Ceria, Cerdas, dan Berkarakter
-                    </span>
+                    <div className="hero-marquee-track font-display font-extrabold tracking-tight text-[clamp(1.75rem,3.2vw,2.75rem)] leading-tight">
+                      {[0, 1].map((dupIndex) => (
+                        <div
+                          key={dupIndex}
+                          aria-hidden={dupIndex === 1 ? 'true' : undefined}
+                          className="flex items-center gap-3 sm:gap-4 pr-10 sm:pr-14 whitespace-nowrap shrink-0"
+                        >
+                          <span className="hero-sparkle-pulse text-amber-500">
+                            <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
+                          </span>
+                          <span className="bg-gradient-to-r from-slate-900 via-sky-700 to-indigo-700 dark:from-white dark:via-sky-300 dark:to-amber-200 bg-clip-text text-transparent hero-text-gradient-animated">
+                            Sekolah Dasar Negeri Cikawao,
+                          </span>
+                          <span className="hero-word-wave bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-500 bg-clip-text text-transparent hero-text-gradient-animated">
+                            Ceria,
+                          </span>
+                          <span className="hero-word-wave hero-delay-1 bg-gradient-to-r from-emerald-500 via-amber-500 to-orange-500 bg-clip-text text-transparent hero-text-gradient-animated">
+                            Cerdas,
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-200">dan</span>
+                          <span className="hero-word-wave hero-delay-2 bg-gradient-to-r from-rose-500 via-violet-500 to-sky-500 bg-clip-text text-transparent hero-text-gradient-animated">
+                            Berkarakter
+                          </span>
+                          <span className="hero-sparkle-pulse hero-delay-sparkle text-emerald-500">
+                            <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </h1>
 
                   <p className="text-base text-slate-700 leading-relaxed max-w-2xl mb-7">

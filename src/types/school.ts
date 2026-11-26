@@ -386,12 +386,12 @@ export const SCHOOL_INFO = {
   totalRombel: 6,
   totalTeachers: 8,
   rombelDistribution: [
-    { rombel: 'Kelas 1' as RombelName, count: 31 },
-    { rombel: 'Kelas 2' as RombelName, count: 30 },
-    { rombel: 'Kelas 3' as RombelName, count: 31 },
-    { rombel: 'Kelas 4' as RombelName, count: 32 },
-    { rombel: 'Kelas 5' as RombelName, count: 30 },
-    { rombel: 'Kelas 6' as RombelName, count: 30 },
+    { rombel: 'Kelas 1' as RombelName, count: 23 },
+    { rombel: 'Kelas 2' as RombelName, count: 36 },
+    { rombel: 'Kelas 3' as RombelName, count: 25 },
+    { rombel: 'Kelas 4' as RombelName, count: 36 },
+    { rombel: 'Kelas 5' as RombelName, count: 33 },
+    { rombel: 'Kelas 6' as RombelName, count: 31 },
   ],
   vision:
     'Terwujudnya murid yang beriman dan bertakwa kepada Tuhan Yang Maha Esa, bernalar kritis, kreatif, kolaboratif, mandiri, sehat dan peduli terhadap lingkungan, serta komunikatif',

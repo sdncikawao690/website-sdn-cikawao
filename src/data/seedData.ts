@@ -344,7 +344,7 @@ export const DEFAULT_EKSKUL: Omit<EkskulReport, 'createdAt' | 'updatedAt'>[] = [
     participantCount: 184,
     activityDate: '2026-11-10',
     reportSummary:
-      'Analisis daya tampung ruang kelas terhadap jumlah 184 peserta didik aktif (Kelas 1: 31, Kelas 2: 30, Kelas 3: 31, Kelas 4: 32, Kelas 5: 30, Kelas 6: 30) untuk kesiapan tahun ajaran berikutnya.',
+      'Analisis daya tampung ruang kelas terhadap jumlah 184 peserta didik aktif (Kelas 1: 23, Kelas 2: 36, Kelas 3: 25, Kelas 4: 36, Kelas 5: 33, Kelas 6: 31) untuk kesiapan tahun ajaran berikutnya.',
     transparencyNote:
       'Rasio rombel dan ketersediaan meja-kursi terpenuhi sesuai standar pelayanan minimal.',
     imageUrl: GENERATED_IMAGES.heroCampus,
