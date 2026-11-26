@@ -41,6 +41,7 @@ import { Icon3D, type Icon3DName } from './Icon3D';
 import { VideoPlayer } from './MediaViewer';
 import { SafeImage } from './SafeImage';
 import { SilokaFilePreviewModal } from './SilokaFilePreviewModal';
+import { SocialContactIcons } from './SocialContactIcons';
 
 interface PublicPortalProps {
   activeTab: PublicTabId;
@@ -1852,6 +1853,13 @@ export function PublicPortal({
                   </div>
                 </div>
 
+                <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5">
+                  <p className="text-xs font-bold text-slate-800">
+                    Kanal Resmi &amp; Media Sosial Kami
+                  </p>
+                  <SocialContactIcons variant="card" />
+                </div>
+
                 <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-slate-500">
                     Total dokumen tata kelola tersedia:{' '}
@@ -1981,10 +1989,19 @@ export function PublicPortal({
               NIP. {SCHOOL_INFO.principalNip}
             </p>
             <p className="text-xs text-slate-300 mt-2">Email: {SCHOOL_INFO.email}</p>
+            <div className="mt-4">
+              <p className="text-[11px] font-bold text-slate-300 mb-2">
+                Media Sosial &amp; Kontak Kami
+              </p>
+              <SocialContactIcons variant="footer" />
+            </div>
           </div>
         </div>
-        <div className="border-t border-white/10 py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} SDN Cikawao, Kec. Pamulihan, Kab. Sumedang.
+        <div className="border-t border-white/10 py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 space-y-1">
+          <p>© {new Date().getFullYear()} SDN Cikawao, Kec. Pamulihan, Kab. Sumedang.</p>
+          <p className="text-[11px] font-semibold text-sky-300">
+            Powered by Tim IT SDN Cikawao
+          </p>
         </div>
       </footer>
 

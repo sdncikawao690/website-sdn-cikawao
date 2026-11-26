@@ -259,7 +259,7 @@ export function DashboardLayout({
         </div>
 
         {/* Active View */}
-        <div className="p-4 sm:p-8 max-w-6xl w-full">
+        <div className="p-4 sm:p-8 max-w-6xl w-full flex-1">
           {currentNav.id === 'overview' && <OverviewTab onSelectTab={onSelectTab} />}
           {currentNav.id === 'students' && <StudentsAcademicTab />}
           {currentNav.id === 'users' && effectiveRole === 'admin' && <UsersCrudTab />}
@@ -281,6 +281,10 @@ export function DashboardLayout({
             )}
           {currentNav.id === 'siloka' && <SilokaTab />}
         </div>
+
+        <footer className="mt-auto border-t border-sky-200/80 px-4 sm:px-8 py-3 text-center text-xs text-slate-500">
+          Powered by <span className="font-bold text-sky-700">Tim IT SDN Cikawao</span>
+        </footer>
       </div>
     </div>
   );
