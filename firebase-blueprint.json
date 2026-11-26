@@ -297,7 +297,7 @@
         },
         "category": {
           "type": "string",
-          "enum": ["KBM", "Prestasi", "Kurikulum Merdeka", "Kegiatan Sekolah"]
+          "enum": ["KBM", "Prestasi", "Kurikulum Merdeka", "Kegiatan Sekolah", "Ekstrakulikuler"]
         },
         "summary": {
           "type": "string",
@@ -314,6 +314,10 @@
           "maxLength": 250000
         },
         "videoUrl": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "tiktokUrl": {
           "type": "string",
           "maxLength": 500
         },

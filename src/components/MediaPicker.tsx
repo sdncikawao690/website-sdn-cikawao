@@ -212,7 +212,7 @@ export function MediaPicker({
               maxLength={500}
               value={videoUrl}
               onChange={(e) => onVideoChange(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=... atau tautan video Drive/MP4"
+              placeholder="https://www.youtube.com/watch?v=... atau tautan video TikTok / Drive / MP4"
               className="flex-1 px-3 py-2 text-xs border-2 border-slate-200 rounded-xl bg-white font-mono"
             />
             {videoUrl && (

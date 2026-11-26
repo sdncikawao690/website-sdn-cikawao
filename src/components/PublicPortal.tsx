@@ -28,6 +28,7 @@ import { normalizeNik } from '../lib/validation';
 import {
   GENERATED_IMAGES,
   JABAR_BERAKSI_PILLARS,
+  NEWS_CATEGORIES,
   SCHOOL_INFO,
   SILOKA_PILLARS,
   type GalleryCategory,
@@ -639,14 +640,27 @@ export function PublicPortal({
                           <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 mb-4 flex-1">
                             {item.summary}
                           </p>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedNews(item)}
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 self-start cursor-pointer"
-                          >
-                            Baca Selengkapnya
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedNews(item)}
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 cursor-pointer"
+                            >
+                              Baca Selengkapnya
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                            {item.tiktokUrl && isSafeMediaHref(item.tiktokUrl) && (
+                              <a
+                                href={item.tiktokUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-900 dark:text-cyan-300 hover:underline"
+                              >
+                                TikTok
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </article>
                     ))}
@@ -963,9 +977,7 @@ export function PublicPortal({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1 p-1 bg-sky-100/80 rounded-xl border border-sky-200">
-                  {(
-                    ['Semua', 'KBM', 'Kurikulum Merdeka', 'Kegiatan Sekolah', 'Prestasi'] as const
-                  ).map((cat) => (
+                  {(['Semua', ...NEWS_CATEGORIES] as const).map((cat) => (
                     <button
                       key={cat}
                       type="button"
@@ -1033,17 +1045,30 @@ export function PublicPortal({
                               Baca Selengkapnya
                               <ChevronRight className="w-4 h-4" />
                             </button>
-                            {hasDoc && (
-                              <a
-                                href={item.documentUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:underline"
-                              >
-                                <FileText className="w-3.5 h-3.5" />
-                                Lampiran
-                              </a>
-                            )}
+                            <div className="flex items-center gap-2.5">
+                              {item.tiktokUrl && isSafeMediaHref(item.tiktokUrl) && (
+                                <a
+                                  href={item.tiktokUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-900 dark:text-cyan-300 hover:underline"
+                                >
+                                  TikTok
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              )}
+                              {hasDoc && (
+                                <a
+                                  href={item.documentUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:underline"
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  Lampiran
+                                </a>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </article>
@@ -2065,6 +2090,43 @@ export function PublicPortal({
                     Buka Dokumen Pendukung Berita
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
+                </div>
+              )}
+              {selectedNews.tiktokUrl && isSafeMediaHref(selectedNews.tiktokUrl) && (
+                <div className="pt-2 space-y-2.5">
+                  <div className="p-4 rounded-xl border-2 border-slate-200 bg-slate-50/70 space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-2 text-xs font-bold text-slate-900">
+                        <span className="w-5 h-5 rounded-md bg-slate-900 text-white inline-flex items-center justify-center shrink-0">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                            className="w-3.5 h-3.5"
+                          >
+                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2 6.34 6.34 0 0 0 9.49 21.5a6.34 6.34 0 0 0 6.34-6.34V8.76a8.16 8.16 0 0 0 4.76 1.52V6.84a4.86 4.86 0 0 1-1-.15Z" />
+                          </svg>
+                        </span>
+                        Dokumentasi Video TikTok
+                      </span>
+                      <a
+                        href={selectedNews.tiktokUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl"
+                      >
+                        Buka di TikTok
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                    {parseVideoUrl(selectedNews.tiktokUrl)?.kind === 'iframe' && (
+                      <VideoPlayer
+                        url={selectedNews.tiktokUrl}
+                        title={`TikTok ${selectedNews.title}`}
+                        className="w-full max-w-sm mx-auto aspect-[9/16] max-h-[460px] rounded-xl overflow-hidden bg-slate-950"
+                      />
+                    )}
+                  </div>
                 </div>
               )}
             </div>

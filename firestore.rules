@@ -167,15 +167,16 @@ service cloud.firestore {
           'authorName', 'authorUid', 'publishedDate', 'createdAt', 'updatedAt'
         ]) &&
         data.keys().hasOnly([
-          'title', 'category', 'summary', 'content', 'imageUrl', 'videoUrl', 'documentUrl',
+          'title', 'category', 'summary', 'content', 'imageUrl', 'videoUrl', 'tiktokUrl', 'documentUrl',
           'authorName', 'authorUid', 'publishedDate', 'createdAt', 'updatedAt'
         ]) &&
         data.title is string && data.title.size() >= 4 && data.title.size() <= 160 &&
-        data.category in ['KBM', 'Prestasi', 'Kurikulum Merdeka', 'Kegiatan Sekolah'] &&
+        data.category in ['KBM', 'Prestasi', 'Kurikulum Merdeka', 'Kegiatan Sekolah', 'Ekstrakulikuler'] &&
         data.summary is string && data.summary.size() >= 10 && data.summary.size() <= 320 &&
         data.content is string && data.content.size() >= 10 && data.content.size() <= 4000 &&
         data.imageUrl is string && data.imageUrl.size() <= 250000 &&
         (!('videoUrl' in data) || (data.videoUrl is string && data.videoUrl.size() <= 500)) &&
+        (!('tiktokUrl' in data) || (data.tiktokUrl is string && data.tiktokUrl.size() <= 500)) &&
         (!('documentUrl' in data) || (data.documentUrl is string && data.documentUrl.size() <= 500)) &&
         data.authorName is string && data.authorName.size() >= 2 && data.authorName.size() <= 100 &&
         isValidId(data.authorUid) &&
@@ -457,7 +458,7 @@ service cloud.firestore {
         isValidTimestampOnUpdate(incoming()) &&
         (isAdmin() || existing().authorUid == request.auth.uid) &&
         incoming().diff(existing()).affectedKeys().hasOnly([
-          'title', 'category', 'summary', 'content', 'imageUrl', 'videoUrl', 'documentUrl',
+          'title', 'category', 'summary', 'content', 'imageUrl', 'videoUrl', 'tiktokUrl', 'documentUrl',
           'authorName', 'publishedDate', 'updatedAt'
         ]);
       allow delete: if isStaff() && isValidId(newsId);

@@ -1201,6 +1201,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
           MAX_PHOTO_DATA_LEN
         ),
         videoUrl: clampMediaUrl(data.videoUrl, MAX_LINK_LEN),
+        tiktokUrl: clampMediaUrl(data.tiktokUrl, MAX_LINK_LEN),
         documentUrl: clampMediaUrl(data.documentUrl, MAX_LINK_LEN),
         authorName: assertLength(
           'Penulis',

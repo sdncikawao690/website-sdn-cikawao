@@ -68,6 +68,22 @@ export function parseVideoUrl(rawUrl?: string): ParsedVideo | null {
     };
   }
 
+  // TikTok (standard video URL or shortlink)
+  const tiktokVideoMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/i);
+  if (tiktokVideoMatch?.[1]) {
+    return {
+      kind: 'iframe',
+      src: `https://www.tiktok.com/embed/v2/${tiktokVideoMatch[1]}`,
+    };
+  }
+
+  if (/(?:^https?:\/\/)?(?:www\.|m\.|vt\.|vm\.)?tiktok\.com\//i.test(url)) {
+    return {
+      kind: 'link',
+      src: url,
+    };
+  }
+
   // Direct HTML5 video URL
   if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url)) {
     return {

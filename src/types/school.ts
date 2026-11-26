@@ -28,9 +28,18 @@ export type CapaianP5 =
 
 export type NewsCategory =
   | 'KBM'
-  | 'Prestasi'
   | 'Kurikulum Merdeka'
-  | 'Kegiatan Sekolah';
+  | 'Kegiatan Sekolah'
+  | 'Ekstrakulikuler'
+  | 'Prestasi';
+
+export const NEWS_CATEGORIES: NewsCategory[] = [
+  'KBM',
+  'Kurikulum Merdeka',
+  'Kegiatan Sekolah',
+  'Ekstrakulikuler',
+  'Prestasi',
+];
 
 export type GalleryCategory =
   | 'KBM'
@@ -251,6 +260,7 @@ export interface NewsArticle {
   content: string;
   imageUrl: string;
   videoUrl?: string;
+  tiktokUrl?: string;
   documentUrl?: string;
   authorName: string;
   authorUid: string;

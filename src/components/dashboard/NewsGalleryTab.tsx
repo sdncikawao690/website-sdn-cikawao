@@ -10,9 +10,10 @@ import {
   X,
 } from 'lucide-react';
 import { useSchool } from '../../context/SchoolContext';
-import { parseVideoUrl } from '../../lib/media';
+import { isSafeMediaHref, parseVideoUrl } from '../../lib/media';
 import {
   GENERATED_IMAGES,
+  NEWS_CATEGORIES,
   type GalleryCategory,
   type GalleryItem,
   type GalleryMediaType,
@@ -39,6 +40,7 @@ export function NewsGalleryTab() {
     content: '',
     imageUrl: GENERATED_IMAGES.kbmClassroom,
     videoUrl: '',
+    tiktokUrl: '',
     documentUrl: '',
     authorName: user?.displayName || 'Admin SDN Cikawao',
     authorUid: user?.uid || '',
@@ -73,6 +75,7 @@ export function NewsGalleryTab() {
       content: '',
       imageUrl: GENERATED_IMAGES.kbmClassroom,
       videoUrl: '',
+      tiktokUrl: '',
       documentUrl: '',
       authorName: user?.displayName || 'Admin SDN Cikawao',
       authorUid: user?.uid || '',
@@ -92,6 +95,7 @@ export function NewsGalleryTab() {
       content: n.content,
       imageUrl: n.imageUrl,
       videoUrl: n.videoUrl || '',
+      tiktokUrl: n.tiktokUrl || '',
       documentUrl: n.documentUrl || '',
       authorName: n.authorName,
       authorUid: n.authorUid,
@@ -256,6 +260,20 @@ export function NewsGalleryTab() {
                           <span className="font-bold text-rose-600">Dilengkapi Video</span>
                         </>
                       )}
+                      {item.tiktokUrl && isSafeMediaHref(item.tiktokUrl) && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <a
+                            href={item.tiktokUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-0.5 font-bold text-slate-900 dark:text-cyan-300 hover:underline"
+                          >
+                            TikTok
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </>
+                      )}
                       {item.documentUrl && (
                         <>
                           <span aria-hidden="true">·</span>
@@ -405,10 +423,11 @@ export function NewsGalleryTab() {
                     }
                     className="w-full px-3 py-2 text-sm border-2 border-slate-200 rounded-xl bg-white"
                   >
-                    <option value="KBM">KBM</option>
-                    <option value="Kurikulum Merdeka">Kurikulum Merdeka</option>
-                    <option value="Kegiatan Sekolah">Kegiatan Sekolah</option>
-                    <option value="Prestasi">Prestasi</option>
+                    {NEWS_CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -438,6 +457,57 @@ export function NewsGalleryTab() {
                 documentUrl={newsForm.documentUrl || ''}
                 onDocumentChange={(val) => setNewsForm({ ...newsForm, documentUrl: val })}
               />
+
+              <div className="bg-slate-50/80 border-2 border-slate-200 rounded-2xl p-4 space-y-2">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-md bg-slate-900 text-white inline-flex items-center justify-center shrink-0">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden="true"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15.2 6.34 6.34 0 0 0 9.49 21.5a6.34 6.34 0 0 0 6.34-6.34V8.76a8.16 8.16 0 0 0 4.76 1.52V6.84a4.86 4.86 0 0 1-1-.15Z" />
+                    </svg>
+                  </span>
+                  <span>Link TikTok Dokumentasi (Opsional)</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    maxLength={500}
+                    value={newsForm.tiktokUrl || ''}
+                    onChange={(e) => setNewsForm({ ...newsForm, tiktokUrl: e.target.value })}
+                    placeholder="https://www.tiktok.com/@sdncikawao/video/... atau https://vt.tiktok.com/..."
+                    className="flex-1 px-3 py-2 text-xs border-2 border-slate-200 rounded-xl bg-white font-mono"
+                  />
+                  {newsForm.tiktokUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setNewsForm({ ...newsForm, tiktokUrl: '' })}
+                      className="px-2.5 py-1.5 text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl cursor-pointer shrink-0"
+                    >
+                      Hapus
+                    </button>
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                  <span>
+                    Tempel tautan video TikTok kegiatan KBM, sekolah, atau ekstrakulikuler.
+                  </span>
+                  {newsForm.tiktokUrl && isSafeMediaHref(newsForm.tiktokUrl) && (
+                    <a
+                      href={newsForm.tiktokUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-bold text-sky-700 hover:underline"
+                    >
+                      Pratinjau Link TikTok
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
