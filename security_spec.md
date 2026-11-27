@@ -21,3 +21,5 @@
 10. **Oversized String Exhaustion**: Creating `/news/n2` with `content` > 4000 chars or `title` > 160 chars -> `PERMISSION_DENIED`.
 11. **Invalid Enum Injection**: Creating `/students/s1` with `rombel: 'Kelas 9'` or `gender: 'X'` -> `PERMISSION_DENIED`.
 12. **Admin Marker Forgery**: Non-admin attempts to create `/admins/{myUid}` -> `PERMISSION_DENIED`.
+13. **Academic Calendar Date & Privilege Spoofing**: Non-admin writes to `/academic_events/e1` or staff submits invalid date string `startDate: 'invalid-date'` -> `PERMISSION_DENIED`.
+

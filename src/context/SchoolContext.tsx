@@ -22,6 +22,7 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import {
+  DEFAULT_ACADEMIC_EVENTS,
   DEFAULT_ANNOUNCEMENTS,
   DEFAULT_EKSKUL,
   DEFAULT_GALLERY,
@@ -62,6 +63,7 @@ import {
   GENERATED_IMAGES,
   SCHOOL_INFO,
   TIM_IT_ACCOUNT,
+  type AcademicEvent,
   type AdminMarker,
   type Announcement,
   type EkskulReport,
@@ -103,6 +105,7 @@ interface SchoolContextValue {
   pkksItems: PkksItem[];
   ekskulReports: EkskulReport[];
   announcements: Announcement[];
+  academicEvents: AcademicEvent[];
   students: StudentRecord[];
   users: UserAccount[];
   silokaTickets: SilokaTicket[];
@@ -169,6 +172,11 @@ interface SchoolContextValue {
     isEdit: boolean
   ) => Promise<void>;
   removeAnnouncement: (id: string) => Promise<void>;
+  saveAcademicEvent: (
+    data: Omit<AcademicEvent, 'createdAt' | 'updatedAt'>,
+    isEdit: boolean
+  ) => Promise<void>;
+  removeAcademicEvent: (id: string) => Promise<void>;
   createSilokaTicket: (input: {
     reporterName: string;
     reporterPhone?: string;
@@ -227,6 +235,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
   const [pkksItems, setPkksItems] = useState<PkksItem[]>(DEFAULT_PKKS);
   const [ekskulReports, setEkskulReports] = useState<EkskulReport[]>(DEFAULT_EKSKUL);
   const [announcements, setAnnouncements] = useState<Announcement[]>(DEFAULT_ANNOUNCEMENTS);
+  const [academicEvents, setAcademicEvents] = useState<AcademicEvent[]>(DEFAULT_ACADEMIC_EVENTS);
 
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [users, setUsers] = useState<UserAccount[]>([]);
@@ -354,7 +363,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
       const loadPublicData = async () => {
         setLoadingData(true);
         try {
-          const [siteSnap, tSnap, nSnap, gSnap, pSnap, eSnap, aSnap, sdSnap] = await Promise.all([
+          const [siteSnap, tSnap, nSnap, gSnap, pSnap, eSnap, aSnap, sdSnap, calSnap] = await Promise.all([
             getDoc(doc(db, 'site_settings', 'landing')),
             getDocs(collection(db, 'teachers')),
             getDocs(collection(db, 'news')),
@@ -363,6 +372,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
             getDocs(collection(db, 'ekskul_reports')),
             getDocs(collection(db, 'announcements')),
             getDocs(collection(db, 'siloka_documents')),
+            getDocs(collection(db, 'academic_events')),
           ]);
           if (cancelled) return;
 
@@ -432,6 +442,14 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
             setSilokaDocuments(list);
           } else {
             setSilokaDocuments([]);
+          }
+
+          if (!calSnap.empty) {
+            const list = calSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as AcademicEvent);
+            list.sort((a, b) => a.startDate.localeCompare(b.startDate));
+            setAcademicEvents(list);
+          } else {
+            setAcademicEvents(DEFAULT_ACADEMIC_EVENTS);
           }
         } catch (error) {
           console.warn('Memuat tampilan dasar publik:', error);
@@ -597,6 +615,22 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
       )
     );
 
+    unsubs.push(
+      onSnapshot(
+        collection(db, 'academic_events'),
+        (snap) => {
+          if (!snap.empty) {
+            const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as AcademicEvent);
+            list.sort((a, b) => a.startDate.localeCompare(b.startDate));
+            setAcademicEvents(list);
+          } else {
+            setAcademicEvents(DEFAULT_ACADEMIC_EVENTS);
+          }
+        },
+        (error) => handleFirestoreError(error, OperationType.LIST, 'academic_events')
+      )
+    );
+
     // Admin-only PII & management listeners
     if (isAuthorizedAdmin && userRole === 'admin') {
       unsubs.push(
@@ -655,12 +689,13 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
       autoSeedAttemptedRef.current = true;
       void (async () => {
         try {
-          const [tCheck, pCheck, nCheck] = await Promise.all([
+          const [tCheck, pCheck, nCheck, calCheck] = await Promise.all([
             getDocs(collection(db, 'teachers')),
             getDocs(collection(db, 'pkks_items')),
             getDocs(collection(db, 'news')),
+            getDocs(collection(db, 'academic_events')),
           ]);
-          if (tCheck.empty && pCheck.empty && nCheck.empty) {
+          if ((tCheck.empty && pCheck.empty && nCheck.empty) || calCheck.empty) {
             await seedInitialSchoolData(
               user.uid,
               clampString(user.displayName || SCHOOL_INFO.principalName, 100)
@@ -1483,6 +1518,75 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     [assertAuthorizedAdmin]
   );
 
+  const saveAcademicEvent = useCallback(
+    async (data: Omit<AcademicEvent, 'createdAt' | 'updatedAt'>, isEdit: boolean) => {
+      assertAuthorizedAdmin();
+      if (!user) throw new Error('Autentikasi diperlukan.');
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      const startDate = data.startDate.trim();
+      const endDate = (data.endDate || data.startDate).trim();
+      if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        throw new Error('Format tanggal agenda harus YYYY-MM-DD yang valid.');
+      }
+      if (endDate < startDate) {
+        throw new Error('Tanggal selesai tidak boleh lebih awal dari tanggal mulai.');
+      }
+
+      const docId = assertValidId(isEdit ? data.id : generateSafeId('cal'));
+      const payload = {
+        title: assertLength('Judul Agenda', data.title, 3, 150),
+        category: data.category,
+        startDate,
+        endDate,
+        targetRombel: data.targetRombel,
+        location: clampString(data.location || '', 120),
+        description: assertLength('Keterangan Agenda', data.description, 4, 600),
+        isHoliday: Boolean(data.isHoliday || data.category === 'Hari Libur'),
+        authorName: assertLength(
+          'Penanggung Jawab',
+          data.authorName || user.displayName || SCHOOL_INFO.principalName,
+          2,
+          100
+        ),
+        updatedAt: serverTimestamp(),
+      };
+
+      const ref = doc(db, 'academic_events', docId);
+      try {
+        const existingSnap = isEdit ? await getDoc(ref) : null;
+        if (isEdit && existingSnap?.exists()) {
+          await updateDoc(ref, payload);
+        } else {
+          await setDoc(ref, {
+            ...payload,
+            authorUid: assertValidId(user.uid),
+            createdAt: serverTimestamp(),
+          });
+        }
+      } catch (error) {
+        handleFirestoreError(
+          error,
+          isEdit ? OperationType.UPDATE : OperationType.CREATE,
+          `academic_events/${docId}`
+        );
+      }
+    },
+    [user, assertAuthorizedAdmin]
+  );
+
+  const removeAcademicEvent = useCallback(
+    async (id: string) => {
+      assertAuthorizedAdmin();
+      const docId = assertValidId(id);
+      try {
+        await deleteDoc(doc(db, 'academic_events', docId));
+      } catch (error) {
+        handleFirestoreError(error, OperationType.DELETE, `academic_events/${docId}`);
+      }
+    },
+    [assertAuthorizedAdmin]
+  );
+
   const createSilokaTicket = useCallback(
     async (input: {
       reporterName: string;
@@ -1779,6 +1883,7 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     pkksItems,
     ekskulReports,
     announcements,
+    academicEvents,
     students,
     users,
     silokaTickets,
@@ -1813,6 +1918,8 @@ export function SchoolProvider({ children }: { children: React.ReactNode }) {
     removeEkskul,
     saveAnnouncement,
     removeAnnouncement,
+    saveAcademicEvent,
+    removeAcademicEvent,
     createSilokaTicket,
     updateSilokaTicket,
     removeSilokaTicket,

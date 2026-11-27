@@ -847,6 +847,82 @@
         }
       },
       "required": ["nisn", "updatedAt"]
+    },
+    "AcademicEvent": {
+      "title": "AcademicEvent",
+      "description": "Interactive school academic calendar event covering school activities, examinations, and holidays.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 150
+        },
+        "category": {
+          "type": "string",
+          "enum": ["Kegiatan Sekolah", "Ujian", "Hari Libur"]
+        },
+        "startDate": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "endDate": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "targetRombel": {
+          "type": "string",
+          "enum": ["Semua Kelas", "Kelas 1", "Kelas 2", "Kelas 3", "Kelas 4", "Kelas 5", "Kelas 6"]
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "description": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 600
+        },
+        "isHoliday": {
+          "type": "boolean"
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "authorUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "title",
+        "category",
+        "startDate",
+        "endDate",
+        "targetRombel",
+        "description",
+        "isHoliday",
+        "authorName",
+        "authorUid",
+        "createdAt",
+        "updatedAt"
+      ]
     }
   },
   "firestore": {
@@ -901,6 +977,10 @@
     "/nisn_lookup/{lookupId}": {
       "schema": { "$ref": "#/entities/NisnLookup" },
       "description": "Blind SHA-256 lookup table returning only NISN for matching student name or NIK."
+    },
+    "/academic_events/{eventId}": {
+      "schema": { "$ref": "#/entities/AcademicEvent" },
+      "description": "Publicly readable, admin-managed academic calendar events (school activities, exams, and holidays)."
     }
   }
 }

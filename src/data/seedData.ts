@@ -14,6 +14,7 @@ import {
 import {
   GENERATED_IMAGES,
   SCHOOL_INFO,
+  type AcademicEvent,
   type Announcement,
   type EkskulReport,
   type GalleryItem,
@@ -528,6 +529,187 @@ export const DEFAULT_USERS_SEED: Omit<UserAccount, 'createdAt' | 'updatedAt'>[] 
   },
 ];
 
+export const DEFAULT_ACADEMIC_EVENTS: Omit<AcademicEvent, 'createdAt' | 'updatedAt'>[] = [
+  {
+    id: 'cal_hgn_2026',
+    title: 'Peringatan Hari Guru Nasional & Apresiasi Pendidik',
+    category: 'Kegiatan Sekolah',
+    startDate: '2026-11-25',
+    endDate: '2026-11-25',
+    targetRombel: 'Semua Kelas',
+    location: 'Lapangan Upacara SDN Cikawao',
+    description:
+      'Upacara bendera peringatan Hari Guru Nasional dilanjutkan dengan pentas literasi dan apresiasi untuk 8 guru SDN Cikawao.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_jabar_beraksi_nov',
+    title: 'Latihan Gabungan Pramuka & Ansambel Angklung Sunda',
+    category: 'Kegiatan Sekolah',
+    startDate: '2026-11-28',
+    endDate: '2026-11-28',
+    targetRombel: 'Semua Kelas',
+    location: 'Halaman & Ruang Kesenian SDN Cikawao',
+    description:
+      'Kegiatan pembinaan karakter Jabar Beraksi bagi peserta didik Kelas 1 s.d. Kelas 6 bersama pembina Pramuka dan seni budaya Sunda.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_asas_ganjil_2026',
+    title: 'Asesmen Sumatif Akhir Semester (ASAS) Ganjil 2026/2027',
+    category: 'Ujian',
+    startDate: '2026-12-01',
+    endDate: '2026-12-05',
+    targetRombel: 'Semua Kelas',
+    location: 'Ruang Kelas I s.d. VI SDN Cikawao',
+    description:
+      'Pelaksanaan evaluasi sumatif akhir semester ganjil Kurikulum Merdeka untuk seluruh mata pelajaran Kelas 1 hingga Kelas 6 mulai pukul 07.15 WIB.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_remedial_asas_2026',
+    title: 'Asesmen Susulan & Pengayaan Nilai Akhir Semester',
+    category: 'Ujian',
+    startDate: '2026-12-07',
+    endDate: '2026-12-09',
+    targetRombel: 'Semua Kelas',
+    location: 'Ruang Kelas Masing-Masing',
+    description:
+      'Kesempatan asesmen susulan bagi siswa yang berhalangan sakit/izin serta program remedial dan pengayaan bersama wali kelas.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_class_meeting_2026',
+    title: 'Class Meeting, Gelar Karya P5 & Pentas Budaya Sunda',
+    category: 'Kegiatan Sekolah',
+    startDate: '2026-12-15',
+    endDate: '2026-12-17',
+    targetRombel: 'Semua Kelas',
+    location: 'Lingkungan Kampus SDN Cikawao',
+    description:
+      'Pameran hasil karya Projek Penguatan Profil Pelajar Pancasila (P5), lomba olahraga tradisional, dan pentas angklung antar-rombel.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_rapor_ganjil_2026',
+    title: 'Pembagian Rapor Semester Ganjil & Konsultasi Orang Tua',
+    category: 'Kegiatan Sekolah',
+    startDate: '2026-12-19',
+    endDate: '2026-12-19',
+    targetRombel: 'Semua Kelas',
+    location: 'Ruang Kelas I s.d. VI SDN Cikawao',
+    description:
+      'Penyerahan rapor capaian Kurikulum Merdeka kepada orang tua/wali murid pukul 08.30 WIB sekaligus konsultasi perkembangan siswa.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_libur_semester_2026',
+    title: 'Libur Semester Ganjil Tahun Ajaran 2026/2027',
+    category: 'Hari Libur',
+    startDate: '2026-12-21',
+    endDate: '2027-01-02',
+    targetRombel: 'Semua Kelas',
+    location: 'Kalender Pendidikan Jawa Barat',
+    description:
+      'Masa libur akhir semester ganjil bagi seluruh peserta didik SDN Cikawao. Kegiatan belajar mengajar aktif kembali pada awal semester genap.',
+    isHoliday: true,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_natal_2026',
+    title: 'Hari Raya Natal (Libur Nasional)',
+    category: 'Hari Libur',
+    startDate: '2026-12-25',
+    endDate: '2026-12-25',
+    targetRombel: 'Semua Kelas',
+    location: 'Libur Nasional',
+    description: 'Hari libur nasional memperingati Hari Raya Natal 2026.',
+    isHoliday: true,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_tahun_baru_2027',
+    title: 'Tahun Baru Masehi 2027 (Libur Nasional)',
+    category: 'Hari Libur',
+    startDate: '2027-01-01',
+    endDate: '2027-01-01',
+    targetRombel: 'Semua Kelas',
+    location: 'Libur Nasional',
+    description: 'Hari libur nasional menyambut Tahun Baru Masehi 2027.',
+    isHoliday: true,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_awal_genap_2027',
+    title: 'Hari Pertama Masuk Semester Genap & Pembiasaan Pagi',
+    category: 'Kegiatan Sekolah',
+    startDate: '2027-01-04',
+    endDate: '2027-01-04',
+    targetRombel: 'Semua Kelas',
+    location: 'Kampus SDN Cikawao',
+    description:
+      'Penyambutan peserta didik Kelas 1–6 di awal Semester Genap 2026/2027, apel pagi, serta pengenalan target pembelajaran baru.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_isra_mikraj_2027',
+    title: 'Isra Mikraj Nabi Muhammad SAW (Libur Nasional)',
+    category: 'Hari Libur',
+    startDate: '2027-01-16',
+    endDate: '2027-01-16',
+    targetRombel: 'Semua Kelas',
+    location: 'Libur Nasional',
+    description: 'Hari libur nasional memperingati Isra Mikraj Nabi Muhammad SAW.',
+    isHoliday: true,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_imlek_2027',
+    title: 'Tahun Baru Imlek 2578 Kongzili (Libur Nasional)',
+    category: 'Hari Libur',
+    startDate: '2027-02-17',
+    endDate: '2027-02-17',
+    targetRombel: 'Semua Kelas',
+    location: 'Libur Nasional',
+    description: 'Hari libur nasional Tahun Baru Imlek 2578 Kongzili.',
+    isHoliday: true,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+  {
+    id: 'cal_pts_genap_2027',
+    title: 'Penilaian Tengah Semester (PTS) Genap 2026/2027',
+    category: 'Ujian',
+    startDate: '2027-03-08',
+    endDate: '2027-03-12',
+    targetRombel: 'Semua Kelas',
+    location: 'Ruang Kelas I s.d. VI SDN Cikawao',
+    description:
+      'Asesmen sumatif tengah semester genap untuk memantau capaian kompetensi literasi, numerasi, dan materi Kurikulum Merdeka.',
+    isHoliday: false,
+    authorName: SCHOOL_INFO.principalName,
+    authorUid: 'seed_admin',
+  },
+];
+
 export async function seedInitialSchoolData(
   adminUid: string,
   adminName: string
@@ -546,6 +728,7 @@ export async function seedInitialSchoolData(
     aSnap,
     sSnap,
     uSnap,
+    calSnap,
   ] = await Promise.all([
     getDocs(collection(db, 'teachers')),
     getDocs(collection(db, 'news')),
@@ -555,6 +738,7 @@ export async function seedInitialSchoolData(
     getDocs(collection(db, 'announcements')),
     getDocs(collection(db, 'students')),
     getDocs(collection(db, 'users')),
+    getDocs(collection(db, 'academic_events')),
   ]);
 
   const existingTeachers = new Set(tSnap.docs.map((d) => d.id));
@@ -565,6 +749,7 @@ export async function seedInitialSchoolData(
   const existingAnnouncements = new Set(aSnap.docs.map((d) => d.id));
   const existingStudents = new Set(sSnap.docs.map((d) => d.id));
   const existingUsers = new Set(uSnap.docs.map((d) => d.id));
+  const existingCalendar = new Set(calSnap.docs.map((d) => d.id));
 
   const batch = writeBatch(db);
   const ts = serverTimestamp();
@@ -677,6 +862,19 @@ export async function seedInitialSchoolData(
     if (!existingUsers.has(id)) {
       batch.set(doc(db, 'users', id), {
         ...usrData,
+        createdAt: ts,
+        updatedAt: ts,
+      });
+      ops++;
+    }
+  }
+
+  for (const { id, ...calData } of DEFAULT_ACADEMIC_EVENTS) {
+    if (!existingCalendar.has(id)) {
+      batch.set(doc(db, 'academic_events', id), {
+        ...calData,
+        authorUid: adminUid,
+        authorName: safeAdminName,
         createdAt: ts,
         updatedAt: ts,
       });

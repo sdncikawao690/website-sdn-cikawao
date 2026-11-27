@@ -6,6 +6,7 @@ export type UserStatus = 'aktif' | 'nonaktif';
 export type PublicTabId =
   | 'beranda'
   | 'profil'
+  | 'kalender'
   | 'peserta-didik'
   | 'kbm-galeri'
   | 'pkks'
@@ -127,6 +128,14 @@ export const JABAR_BERAKSI_PILLARS: Array<{
 
 export type AnnouncementPriority = 'Penting' | 'Mendesak' | 'Informasi';
 export type AnnouncementTarget = 'Semua Kelas' | RombelName;
+
+export type AcademicEventCategory = 'Kegiatan Sekolah' | 'Ujian' | 'Hari Libur';
+
+export const ACADEMIC_EVENT_CATEGORIES: AcademicEventCategory[] = [
+  'Kegiatan Sekolah',
+  'Ujian',
+  'Hari Libur',
+];
 
 export type SilokaCategory =
   | 'Perencanaan'
@@ -375,6 +384,22 @@ export interface SilokaDocument {
   fileName?: string;
   fileSizeLabel?: string;
   uploadedBy: string;
+  authorUid: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface AcademicEvent {
+  id: string;
+  title: string;
+  category: AcademicEventCategory;
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
+  targetRombel: AnnouncementTarget;
+  location?: string;
+  description: string;
+  isHoliday: boolean;
+  authorName: string;
   authorUid: string;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;

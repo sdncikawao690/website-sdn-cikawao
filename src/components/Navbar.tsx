@@ -31,6 +31,12 @@ const NAV_ITEMS: Array<{
     hoverClass: 'hover:text-teal-600',
   },
   {
+    id: 'kalender',
+    label: 'Kalender',
+    activeClass: 'text-indigo-700 underline decoration-2 underline-offset-8',
+    hoverClass: 'hover:text-indigo-600',
+  },
+  {
     id: 'kbm-galeri',
     label: 'KBM & Galeri',
     activeClass: 'text-amber-700 underline decoration-2 underline-offset-8',
@@ -118,7 +124,7 @@ export function Navbar({
         {/* Zone 2: Dedicated Single-Line Tab Links */}
         <nav
           aria-label="Navigasi Utama"
-          className="hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-sm font-semibold text-slate-700"
+          className="hidden lg:flex items-center gap-3.5 xl:gap-5 text-xs xl:text-sm font-semibold text-slate-700"
         >
           {NAV_ITEMS.map((item) => {
             const isActive = viewMode === 'public' && activePublicTab === item.id;

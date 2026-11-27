@@ -13,7 +13,8 @@ export type Icon3DName =
   | 'ekskul'
   | 'siloka'
   | 'users'
-  | 'dashboard';
+  | 'dashboard'
+  | 'calendar';
 
 interface Icon3DProps {
   name: Icon3DName;
@@ -41,6 +42,7 @@ const BG_MAP: Record<Icon3DName, string> = {
   siloka: 'from-indigo-400 to-violet-600 shadow-[0_4px_0_#5b21b6]',
   users: 'from-fuchsia-400 to-purple-600 shadow-[0_4px_0_#7e22ce]',
   dashboard: 'from-teal-400 to-cyan-600 shadow-[0_4px_0_#0e7490]',
+  calendar: 'from-indigo-400 to-sky-600 shadow-[0_4px_0_#0369a1]',
 };
 
 export function Icon3D({ name, size = 'md', className = '' }: Icon3DProps) {
@@ -201,6 +203,20 @@ export function Icon3D({ name, size = 'md', className = '' }: Icon3DProps) {
             <rect x="26" y="8" width="14" height="10" rx="3.5" fill="url(#gGold)" />
             <rect x="26" y="22" width="14" height="18" rx="4" fill="url(#gWhite)" />
             <rect x="8" y="26" width="14" height="14" rx="4" fill="url(#gCoral)" />
+          </g>
+        )}
+
+        {name === 'calendar' && (
+          <g>
+            <rect x="8" y="11" width="32" height="29" rx="5" fill="url(#gWhite)" />
+            <path d="M8 16C8 13.2 10.2 11 13 11H35C37.8 11 40 13.2 40 16V20H8V16Z" fill="url(#gCoral)" />
+            <rect x="15" y="7" width="4" height="7" rx="2" fill="url(#gGold)" />
+            <rect x="29" y="7" width="4" height="7" rx="2" fill="url(#gGold)" />
+            <rect x="13" y="24" width="6" height="5" rx="1.5" fill="url(#gSky)" />
+            <rect x="21" y="24" width="6" height="5" rx="1.5" fill="url(#gMint)" />
+            <rect x="29" y="24" width="6" height="5" rx="1.5" fill="url(#gGold)" />
+            <rect x="13" y="31" width="6" height="5" rx="1.5" fill="url(#gSky)" />
+            <rect x="21" y="31" width="6" height="5" rx="1.5" fill="url(#gCoral)" />
           </g>
         )}
       </svg>

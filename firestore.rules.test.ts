@@ -96,4 +96,12 @@ export const DIRTY_DOZEN_CASES: DirtyDozenCase[] = [
     description: 'Non-admin attempts to insert own UID into /admins collection',
     expected: 'PERMISSION_DENIED',
   },
+  {
+    id: 'DD-13',
+    collection: 'academic_events',
+    operation: 'create',
+    description: 'Non-admin writes academic event or submits invalid YYYY-MM-DD date format',
+    expected: 'PERMISSION_DENIED',
+  },
 ];
+

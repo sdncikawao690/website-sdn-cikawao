@@ -23,6 +23,7 @@ export function OverviewTab({ onSelectTab }: OverviewTabProps) {
     pkksItems,
     ekskulReports,
     announcements,
+    academicEvents,
     silokaTickets,
     users,
     runInitialSeed,
@@ -382,6 +383,18 @@ export function OverviewTab({ onSelectTab }: OverviewTabProps) {
               <span className="text-slate-600">Pengumuman Otomatis Aktif</span>
               <span className="font-mono font-bold tabular-nums text-amber-700">
                 {announcements.filter((a) => a.isActive).length} pengumuman
+              </span>
+            </div>
+            <div className="py-3 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => onSelectTab('calendar')}
+                className="text-slate-600 hover:text-indigo-700 font-medium hover:underline cursor-pointer"
+              >
+                Agenda Kalender Akademik
+              </button>
+              <span className="font-mono font-bold tabular-nums text-indigo-700">
+                {academicEvents.length} agenda
               </span>
             </div>
           </div>

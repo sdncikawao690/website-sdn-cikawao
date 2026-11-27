@@ -4,6 +4,7 @@ import { useSchool } from '../context/SchoolContext';
 import { SCHOOL_INFO, TIM_IT_ACCOUNT } from '../types/school';
 import { Icon3D, type Icon3DName } from './Icon3D';
 import { ThemeModeSwitcher } from './ThemeModeSwitcher';
+import { AcademicCalendarTab } from './dashboard/AcademicCalendarTab';
 import { AnnouncementsTab } from './dashboard/AnnouncementsTab';
 import { JabarBeraksiTab } from './dashboard/JabarBeraksiTab';
 import { NewsGalleryTab } from './dashboard/NewsGalleryTab';
@@ -77,6 +78,13 @@ const DASHBOARD_NAV: NavDef[] = [
     label: 'Jabar Beraksi',
     icon3d: 'ekskul',
     activeBg: 'bg-lime-50 text-emerald-950 border-emerald-300',
+    roles: ['admin', 'guru'],
+  },
+  {
+    id: 'calendar',
+    label: 'Kalender Akademik',
+    icon3d: 'calendar',
+    activeBg: 'bg-indigo-50 text-indigo-950 border-indigo-300',
     roles: ['admin', 'guru'],
   },
   {
@@ -274,6 +282,10 @@ export function DashboardLayout({
           {currentNav.id === 'jabar-beraksi' &&
             (effectiveRole === 'admin' || effectiveRole === 'guru') && (
               <JabarBeraksiTab />
+            )}
+          {currentNav.id === 'calendar' &&
+            (effectiveRole === 'admin' || effectiveRole === 'guru') && (
+              <AcademicCalendarTab />
             )}
           {currentNav.id === 'announcements' &&
             (effectiveRole === 'admin' || effectiveRole === 'guru') && (

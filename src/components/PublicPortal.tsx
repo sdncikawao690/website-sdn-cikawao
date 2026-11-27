@@ -38,6 +38,8 @@ import {
   type PublicTabId,
   type SilokaDocument,
 } from '../types/school';
+import { AcademicCalendarBoard } from './AcademicCalendarBoard';
+import { FooterLocationMap } from './FooterLocationMap';
 import { Icon3D, type Icon3DName } from './Icon3D';
 import { VideoPlayer } from './MediaViewer';
 import { SafeImage } from './SafeImage';
@@ -80,6 +82,13 @@ const PORTAL_SHORTCUTS: Array<{
     desc: 'Sambutan Kepala Sekolah, Visi Misi, 6 rombel, dan profil 8 tenaga pendidik.',
     icon: 'teacher',
     cardClass: 'bg-sky-50/70 border-sky-200 hover:border-sky-400',
+  },
+  {
+    tab: 'kalender',
+    title: 'Kalender Akademik',
+    desc: 'Jadwal kegiatan sekolah, asesmen atau ujian, serta hari libur resmi secara interaktif.',
+    icon: 'calendar',
+    cardClass: 'bg-indigo-50/70 border-indigo-200 hover:border-indigo-400',
   },
   {
     tab: 'kbm-galeri',
@@ -590,6 +599,14 @@ export function PublicPortal({
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Interactive Academic Calendar Preview on Beranda */}
+              <div className="bg-white/80 border-2 border-indigo-200 rounded-3xl p-5 sm:p-7 shadow-sm">
+                <AcademicCalendarBoard
+                  compactMode
+                  onOpenFullCalendar={() => onSelectTab('kalender')}
+                />
               </div>
 
               {/* Kabar Terbaru Highlight */}
@@ -1909,6 +1926,30 @@ export function PublicPortal({
         </section>
       )}
 
+      {/* ===================================================================== */}
+      {/* TAB 7: KALENDER AKADEMIK INTERAKTIF                                   */}
+      {/* ===================================================================== */}
+      {activeTab === 'kalender' && (
+        <section className="flex-1 py-12 bg-gradient-to-br from-indigo-50/80 via-white to-sky-50/70">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AcademicCalendarBoard
+              headerAction={
+                isAuthorizedAdmin ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenDashboard('calendar')}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    Kelola Kalender di Dashboard
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : undefined
+              }
+            />
+          </div>
+        </section>
+      )}
+
       {/* ------------------------------------------------------------------- */}
       {/* QUIET INSTITUTIONAL FOOTER — WITH OFFICIAL SCHOOL LOGO              */}
       {/* ------------------------------------------------------------------- */}
@@ -1955,6 +1996,15 @@ export function PublicPortal({
                   className="hover:text-amber-300 transition-colors cursor-pointer"
                 >
                   Profil & Visi Misi
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onSelectTab('kalender')}
+                  className="hover:text-indigo-300 transition-colors cursor-pointer"
+                >
+                  Kalender Akademik
                 </button>
               </li>
               <li>
@@ -2022,6 +2072,7 @@ export function PublicPortal({
             </div>
           </div>
         </div>
+        <FooterLocationMap />
         <div className="border-t border-white/10 py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400 space-y-1">
           <p>© {new Date().getFullYear()} SDN Cikawao, Kec. Pamulihan, Kab. Sumedang.</p>
           <p className="text-[11px] font-semibold text-sky-300">

@@ -378,6 +378,30 @@ service cloud.firestore {
         data.updatedAt is timestamp;
     }
 
+    function isValidAcademicEvent(data) {
+      return data.keys().hasAll([
+          'title', 'category', 'startDate', 'endDate', 'targetRombel',
+          'description', 'isHoliday', 'authorName', 'authorUid', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'title', 'category', 'startDate', 'endDate', 'targetRombel',
+          'location', 'description', 'isHoliday', 'authorName', 'authorUid', 'createdAt', 'updatedAt'
+        ]) &&
+        data.title is string && data.title.size() >= 3 && data.title.size() <= 150 &&
+        data.category in ['Kegiatan Sekolah', 'Ujian', 'Hari Libur'] &&
+        data.startDate is string && data.startDate.size() == 10 && data.startDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        data.endDate is string && data.endDate.size() == 10 && data.endDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        data.endDate >= data.startDate &&
+        data.targetRombel in ['Semua Kelas', 'Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5', 'Kelas 6'] &&
+        (!('location' in data) || (data.location is string && data.location.size() <= 120)) &&
+        data.description is string && data.description.size() >= 4 && data.description.size() <= 600 &&
+        data.isHoliday is bool &&
+        data.authorName is string && data.authorName.size() >= 2 && data.authorName.size() <= 100 &&
+        isValidId(data.authorUid) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
     // -------------------------------------------------------------------------
     // Collection Rules
     // -------------------------------------------------------------------------
@@ -573,6 +597,23 @@ service cloud.firestore {
         incoming().updatedAt == request.time &&
         incoming().diff(existing()).affectedKeys().hasOnly(['nisn', 'updatedAt']);
       allow delete: if isAdmin() && isValidId(lookupId);
+    }
+
+    match /academic_events/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if true;
+      allow create: if isStaff() && isValidId(eventId) && isValidAcademicEvent(incoming()) &&
+        incoming().authorUid == request.auth.uid &&
+        isValidTimestampOnCreate(incoming());
+      allow update: if isStaff() && isValidId(eventId) && isValidAcademicEvent(incoming()) &&
+        incoming().authorUid == existing().authorUid &&
+        isValidTimestampOnUpdate(incoming()) &&
+        (isAdmin() || existing().authorUid == request.auth.uid) &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'category', 'startDate', 'endDate', 'targetRombel',
+          'location', 'description', 'isHoliday', 'authorName', 'updatedAt'
+        ]);
+      allow delete: if isStaff() && isValidId(eventId);
     }
 
     match /test/connection {
